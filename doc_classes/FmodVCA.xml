@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodVCA" inherits="RefCounted" version="4.0">
+	<brief_description>
+	</brief_description>
+	<description>
+	</description>
+	<tutorials>
+	</tutorials>
+	<members>
+		<member name="path" type="String" setter="" getter="get_path" default="&quot;&quot;">
+		</member>
+		<member name="volume" type="float" setter="set_volume" getter="get_volume" default="-1.0">
+		</member>
+	</members>
+</class>

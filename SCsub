@@ -1,0 +1,14 @@
+# SCsub
+
+Import('env')
+
+sources=[
+    "gd_fmod_event_instance.cpp",
+    "gd_fmod_vca.cpp",
+    "gd_fmod_gd4.cpp",
+    "register_types.cpp",
+]
+
+module_env = env.Clone()
+module_env.add_source_files(module_env.modules_sources, sources)
+module_env.Append(CPPPATH=[".", "api/core/inc", "api/studio/inc", "api/core/lib/x64", "api/studio/lib/x64"])

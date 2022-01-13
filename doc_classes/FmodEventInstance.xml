@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodEventInstance" inherits="Node2D" version="4.0">
+	<brief_description>
+	</brief_description>
+	<description>
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_parameter">
+			<return type="float" />
+			<argument index="0" name="arg0" type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="get_playback_state">
+			<return type="int" enum="FmodEventInstance.PlaybackState" />
+			<description>
+			</description>
+		</method>
+		<method name="pause">
+			<return type="void" />
+			<description>
+			</description>
+		</method>
+		<method name="perform_release">
+			<return type="void" />
+			<description>
+			</description>
+		</method>
+		<method name="play">
+			<return type="void" />
+			<description>
+			</description>
+		</method>
+		<method name="release_event">
+			<return type="void" />
+			<description>
+			</description>
+		</method>
+		<method name="set_parameter">
+			<return type="void" />
+			<argument index="0" name="name" type="String" />
+			<argument index="1" name="value" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="stop">
+			<return type="void" />
+			<argument index="0" name="stop_immediately" type="bool" />
+			<description>
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="event_path" type="String" setter="set_event_path" getter="get_event_path" default="&quot;&quot;">
+		</member>
+	</members>
+	<signals>
+		<signal name="event_beat">
+			<description>
+			</description>
+		</signal>
+		<signal name="event_started">
+			<description>
+			</description>
+		</signal>
+		<signal name="event_stopped">
+			<description>
+			</description>
+		</signal>
+	</signals>
+	<constants>
+		<constant name="PLAYING" value="0" enum="PlaybackState">
+		</constant>
+		<constant name="PAUSED" value="1" enum="PlaybackState">
+		</constant>
+		<constant name="STOPPING" value="2" enum="PlaybackState">
+		</constant>
+		<constant name="STOPPED" value="3" enum="PlaybackState">
+		</constant>
+	</constants>
+</class>
