@@ -258,6 +258,11 @@ FmodManager::FmodManager() {
         singleton = this;
     }
     else {
-        queue_delete();
+		if(singleton != this) {
+			if(!Engine::get_singleton()->is_editor_hint()) {
+				singleton->queue_delete();
+				singleton = this;
+			}
+		}
     }
 }
