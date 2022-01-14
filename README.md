@@ -1,5 +1,5 @@
 # FMOD GD4
-Godot 4 integration of FMOD.
+Godot 4 integration of FMOD (WIP) Status: Usable✔️
 
 # Installation
 1. Clone `godot`: 
