@@ -1,5 +1,5 @@
 # FMOD GD4
-Godot 4 integration of FMOD.
+Godot 4 integration of FMOD. Not feature-complete yet.
 
 # Installation
 1. Clone `godot`: 
@@ -88,3 +88,11 @@ func fade_vca(vca:String, final_value:float, duration:float):
 	tw.play();
 	await tw.finished;
 ```
+
+
+# Completed Features:
+- [x] Singleton and Autoinitialization
+- [x] Playing events and loading banks
+- [x] Get VCAs
+
+The rest of the FMOD API will be added in my free time :+1:, this project isn't a priority.
