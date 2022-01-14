@@ -53,7 +53,7 @@ var main_vca:FmodVCA;
 var music_vca:FmodVCA;
 var sfx_vca:FmodVCA;
 
-func init():
+func _ready():
 	initialize(1024, FmodManager.NORMAL);
 	load_bank("banks/Master.bank", FmodManager.NORMAL_LOAD);
 	load_bank("banks/Master.strings.bank", FmodManager.NORMAL_LOAD);
