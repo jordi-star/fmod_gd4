@@ -4,7 +4,7 @@ Godot 4 integration of FMOD. Not feature-complete yet.
 # Installation
 1. Clone `godot`: 
 > `git clone https://github.com/godotengine/godot`
-2. Clone this repository into Godot's `modules/` folder. Rename the repository to `fmod`.
+2. Clone this repository into Godot's `modules/` folder.
 > `cd godot/modules && git clone https://github.com/summertimejordi/fmod_gd4`
 3. Download [FMOD Engine](https://www.fmod.com/download#FMOD%20Engine-select)
 3. Copy FMOD API folders to the `api` folder in the `fmod_gd4` module.
