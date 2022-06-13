@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<class name="FmodManager" inherits="Node2D" version="4.0">
+<class name="FmodManager" inherits="Node" version="4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
 	</brief_description>
 	<description>
@@ -13,7 +13,7 @@
 			<argument index="1" name="autoplay" type="bool" />
 			<argument index="2" name="one_shot" type="bool" />
 			<description>
-				Create an FMOD Studio Event Instance. See [url="https://www.fmod.com/resources/documentation-api?version=2.02&page=studio-api-eventinstance.html"]FMOD Docs[/url]
+				Create an FMOD Studio Event Instance. See [url="https://www.fmod.com/resources/documentation-api?version=2.02&amp;page=studio-api-eventinstance.html"]FMOD Docs[/url]
 			</description>
 		</method>
 		<method name="get_events">
@@ -25,7 +25,7 @@
 			<return type="FmodVCA" />
 			<argument index="0" name="vca_path" type="String" />
 			<description>
-				Get an FMOD VCA. See [url="https://www.fmod.com/resources/documentation-api?version=2.02&page=studio-api-vca.html"]FMOD Docs[/url]
+				Get an FMOD VCA. See [url="https://www.fmod.com/resources/documentation-api?version=2.02&amp;page=studio-api-vca.html"]FMOD Docs[/url]
 			</description>
 		</method>
 		<method name="initialize">
@@ -33,7 +33,7 @@
 			<argument index="0" name="max_channels" type="int" />
 			<argument index="1" name="studio_flags" type="int" enum="FmodManager.InitFlags" />
 			<description>
-				Initialize the FMOD Studio System. See [url="https://www.fmod.com/resources/documentation-api?version=2.02&page=studio-api-system.html"]FMOD Docs[/url]
+				Initialize the FMOD Studio System. See [url="https://www.fmod.com/resources/documentation-api?version=2.02&amp;page=studio-api-system.html"]FMOD Docs[/url]
 			</description>
 		</method>
 		<method name="load_bank">
@@ -73,17 +73,6 @@
 			</description>
 		</method>
 	</methods>
-	<members>
-		<member name="banks_to_load" type="PackedStringArray" setter="set_banks_to_load" getter="get_banks_to_load" default="PackedStringArray()">
-			Banks to load if [member initialize_on_ready] is true.
-		</member>
-		<member name="initialization_mode" type="int" setter="set_init_mode" getter="get_init_mode" enum="FmodManager.InitFlags" default="1">
-			InitFlags to use if [member initalize_on_ready] is true.
-		</member>
-		<member name="initialize_on_ready" type="bool" setter="set_init_on_ready" getter="get_init_on_ready" default="true">
-			Initialize FMOD on ready.
-		</member>
-	</members>
 	<constants>
 		<constant name="NORMAL" value="0" enum="InitFlags">
 		</constant>

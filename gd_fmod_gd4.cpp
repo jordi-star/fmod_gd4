@@ -13,10 +13,10 @@ FmodManager * FmodManager::singleton;
 
 FmodManager* FmodManager::get_singleton() {
     if(!Engine::get_singleton()->is_editor_hint()) {
-        if(ProjectSettings::get_singleton()->get_setting("fmod/config/auto_initialize")) {
+        if(GLOBAL_GET("fmod/config/auto_initialize")) {
             print_line("Auto-initializing FMOD. Visit \"Project Settings/Fmod\" to configure.");
-            singleton->initialize(ProjectSettings::get_singleton()->get_setting("fmod/config/max_channels"), static_cast<InitFlags>(ProjectSettings::get_singleton()->get_setting("fmod/config/initialization_mode").operator unsigned int()));
-            PackedStringArray banks = ProjectSettings::get_singleton()->get_setting("fmod/config/banks_to_load").operator PackedStringArray();
+            singleton->initialize(GLOBAL_GET("fmod/config/max_channels"), static_cast<InitFlags>(GLOBAL_GET("fmod/config/initialization_mode").operator unsigned int()));
+            PackedStringArray banks = GLOBAL_GET("fmod/config/banks_to_load").operator PackedStringArray();
             
             Array failed_banks = Array();
 

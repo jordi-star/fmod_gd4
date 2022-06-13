@@ -14,11 +14,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include "gd_fmod_event_instance.h"
 #include "gd_fmod_vca.h"
 
-#include "scene/main/node.h"
-#include "scene/main/window.h"
-#include "core/variant/array.h"
 #include "api/core/inc/fmod.hpp"
 #include "api/studio/inc/fmod_studio.hpp"
+#include "core/config/project_settings.h"
+#include "core/variant/array.h"
+#include "scene/main/node.h"
+#include "scene/main/window.h"
 
 class FmodManager : public Node {
     GDCLASS(FmodManager, Node);
@@ -48,7 +49,7 @@ public:
 
     FMOD::Studio::System *f_system;
 
-    Map<String, FMOD::Studio::Bank*> loaded_banks;
+    VMap<String, FMOD::Studio::Bank*> loaded_banks;
     Array events = Array();
 
     Array get_events();
@@ -64,7 +65,7 @@ public:
 	FmodEventInstance* create_event_instance(String event_path, bool autoplay = false, bool one_shot = false);
     FmodVCA* get_vca(String vca_path);
 	FmodEventInstance* oneshot(String event_path, bool autoplay = false);
-    FmodEventInstance* play(String event_path); // Convinence function for ease of use, alias for oneshot(event_path, true)
+    FmodEventInstance* play(String event_path); // Convenience function for ease of use, alias for oneshot(event_path, true)
 
     void randomize_seed();
 

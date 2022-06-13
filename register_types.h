@@ -9,6 +9,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 */
 
 #include "core/object/class_db.h"
+#include "modules/register_module_types.h"
 
-void register_fmod_gd4_types();
-void unregister_fmod_gd4_types();
+void initialize_fmod_gd4_module(ModuleInitializationLevel p_level);
+void uninitialize_fmod_gd4_module(ModuleInitializationLevel p_level);
