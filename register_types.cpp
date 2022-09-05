@@ -17,7 +17,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 static FmodManager* FmodManagerPtr = NULL;
 
 void initialize_fmod_gd4_module(ModuleInitializationLevel p_level) {
-	if (p_level == MODULE_INITIALIZATION_LEVEL_CORE) {
+	if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE) {
 		// Register classes
 		GDREGISTER_CLASS(FmodManager);
 		GDREGISTER_CLASS(FmodEventInstance);
