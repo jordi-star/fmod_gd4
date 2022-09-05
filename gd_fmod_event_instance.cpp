@@ -135,16 +135,20 @@ void FmodEventInstance::perform_release() {
 }
 
 void FmodEventInstance::set_parameter(String p_name, float p_value) {
-	if(_event_instance != nullptr) {
-		_event_instance->setParameterByName(p_name.utf8(), p_value);
+	if(_event_instance == nullptr) {
+		print_line(vformat("Event instance invalid. Could not set paramter %s", p_name));
+		return;
 	}
+	_event_instance->setParameterByName(p_name.utf8(), p_value);
 }
 
 float FmodEventInstance::get_parameter(String p_name) {
-	float r = 0;
-	if(_event_instance != nullptr) {
-		_event_instance->getParameterByName(p_name.utf8(), 0, &r);
+	if(_event_instance == nullptr) {
+		print_line(vformat("Event instance invalid. Could not get paramter %s", p_name));
+		return -1.0;
 	}
+	float r = 0;
+	_event_instance->getParameterByName(p_name.utf8(), 0, &r);
 	return r;
 }
 
@@ -154,38 +158,39 @@ void FmodEventInstance::_notification(int p_notification) {
 			_event_instance->release();
 		}
 	}
-	else if(p_notification == NOTIFICATION_INTERNAL_PROCESS) {
-		if(current_callback != -1) {
-			//print_line("CALLBACK");
-			switch(current_callback) {
-				case FMOD_STUDIO_EVENT_CALLBACK_STARTED: {
-					emit_signal("event_started");
-				} break;
-				case FMOD_STUDIO_EVENT_CALLBACK_SOUND_STOPPED: {
-					emit_signal("event_stopped");
-					if (one_shot) {
-						perform_release();
-					}
-				} break;
-				case FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_BEAT: {
-					current_beat += 1;
-					emit_signal("event_beat", current_beat);
-				} break;
-			}
-		}
-		current_callback = -1;
-		if(one_shot) {
-			//print_line(vformat("Oneshot", 0));
-			FMOD_STUDIO_PLAYBACK_STATE state = FMOD_STUDIO_PLAYBACK_STOPPED;
-			FMOD_RESULT f = _event_instance->getPlaybackState(&state);
-			if (f == FMOD_OK) {
-				if (state == FMOD_STUDIO_PLAYBACK_STOPPED) {
+	else if(p_notification != NOTIFICATION_INTERNAL_PROCESS) {
+		return;
+	}
+
+	if(current_callback != -1) {
+		switch(current_callback) {
+			case FMOD_STUDIO_EVENT_CALLBACK_STARTED: {
+				emit_signal("event_started");
+			} break;
+			case FMOD_STUDIO_EVENT_CALLBACK_SOUND_STOPPED: {
+				emit_signal("event_stopped");
+				if (one_shot) {
 					perform_release();
 				}
-			}
-			else {
+			} break;
+			case FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_BEAT: {
+				current_beat += 1;
+				emit_signal("event_beat", current_beat);
+			} break;
+		}
+	}
+	current_callback = -1;
+	if(one_shot) {
+		//print_line(vformat("Oneshot", 0));
+		FMOD_STUDIO_PLAYBACK_STATE state = FMOD_STUDIO_PLAYBACK_STOPPED;
+		FMOD_RESULT f = _event_instance->getPlaybackState(&state);
+		if (f == FMOD_OK) {
+			if (state == FMOD_STUDIO_PLAYBACK_STOPPED) {
 				perform_release();
 			}
+		}
+		else {
+			perform_release();
 		}
 	}
 }

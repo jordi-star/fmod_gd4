@@ -217,6 +217,8 @@ void FmodManager::_bind_methods() {
     ClassDB::bind_method(D_METHOD("play", "event_path"), &FmodManager::play);
     ClassDB::bind_method(D_METHOD("get_vca", "vca_path"), &FmodManager::get_vca);
     ClassDB::bind_method(D_METHOD("load_bank", "path_relative_to_project_root", "load_flags"), &FmodManager::load_bank);
+    ClassDB::bind_method(D_METHOD("set_global_parameter", "param_name", "new_value"), &FmodManager::set_global_parameter);
+    ClassDB::bind_method(D_METHOD("get_global_parameter", "param_name"), &FmodManager::get_global_parameter);
     ClassDB::bind_method(D_METHOD("set_events", "a"), &FmodManager::set_events);
     ClassDB::bind_method(D_METHOD("get_events"), &FmodManager::get_events);
     ADD_PROPERTY(PropertyInfo(Variant::INT, "events", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_INTERNAL), "set_events", "get_events");
@@ -241,6 +243,24 @@ Array FmodManager::get_events() {
 
 void FmodManager::set_events(Array a) {
     events = a;
+}
+
+void FmodManager::set_global_parameter(String p_name, float p_value) {
+	if(!initialized) {
+		print_line(vformat("FMOD not initalized. Could not set global paramter %s", p_name));
+		return;
+	}
+	f_system->setParameterByName(p_name.utf8(), p_value);
+}
+
+float FmodManager::get_global_parameter(String p_name) {
+	if(!initialized) {
+		print_line(vformat("FMOD not initalized. Could not get global paramter %s", p_name));
+		return -1.0;
+	}
+	float r = 0;
+	f_system->getParameterByName(p_name.utf8(), 0, &r);
+	return r;
 }
 
 void FmodManager::run_callbacks() {

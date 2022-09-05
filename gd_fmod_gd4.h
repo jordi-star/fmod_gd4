@@ -55,6 +55,9 @@ public:
     Array get_events();
     void set_events(Array a);
 
+	void set_global_parameter(String p_name, float p_value);
+	float get_global_parameter(String p_name);
+
     bool initialized = false;
 
     void run_callbacks();
