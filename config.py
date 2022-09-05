@@ -6,7 +6,6 @@ def can_build(env, platform):
 def configure(env):
     if env["platform"] == "windows":
         # Mostly VisualStudio
-        print(env.keys());
         if env["CC"] == "cl":
             if env["arch"]=="x86":
                 env.Append(LINKFLAGS=["fmodL.dll", "fmodstudioL.dll"])
