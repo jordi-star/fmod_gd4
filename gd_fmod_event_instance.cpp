@@ -69,7 +69,7 @@ void FmodEventInstance::play() {
 		}
 	}
 	else {
-		queue_delete();
+		queue_free();
 	}
 }
 void FmodEventInstance::pause() {
@@ -131,7 +131,7 @@ void FmodEventInstance::perform_release() {
 		}
         _event_instance->release();
     }
-	queue_delete();
+    queue_free();
 }
 
 void FmodEventInstance::set_parameter(String p_name, float p_value) {

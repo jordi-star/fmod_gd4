@@ -1,4 +1,4 @@
-# config.py
+#config.py
 
 def can_build(env, platform):
     return True
@@ -16,6 +16,10 @@ def configure(env):
     elif env["platform"] == "osx":
         env.Append(
             LIBPATH=["#modules/fmod_gd4/api/core/lib/", "#modules/fmod_gd4/api/studio/lib/"])
+        env.Append(LIBS=["fmodL", "fmodstudioL"])
+    elif env["platform"] == "linuxbsd":
+        env.Append(
+            LIBPATH=["#modules/fmod_gd4/api/core/lib/x86_64/", "#modules/fmod_gd4/api/studio/lib/x86_64/"])
         env.Append(LIBS=["fmodL", "fmodstudioL"])
 
 def get_doc_path():

@@ -39,7 +39,7 @@ Error FmodManager::initialize(int max_channels, InitFlags studio_flags) {
     if(!initialized) {
         FMOD_RESULT result = FMOD::Studio::System::create(&f_system);
         if(result != FMOD_RESULT::FMOD_OK) {
-            print_line("An error occurred while trying to create the Fmod Studio System." + vformat("Error code: %s", itos(static_cast<int>(result))));
+            print_line("An error occurred while trying to create the Fmod Studio System. " + vformat("Error code: %s", itos(static_cast<int>(result))));
             return ERR_CANT_CREATE;
         }
 
@@ -290,7 +290,7 @@ FmodManager::FmodManager() {
     else {
 		if(singleton != this) {
 			if(!Engine::get_singleton()->is_editor_hint()) {
-				singleton->queue_delete();
+				singleton->queue_free();
 				singleton = this;
 			}
 		}
