@@ -2,18 +2,36 @@
 Godot 4 integration of FMOD. Not feature-complete yet.
 
 # Installation
-1. Clone `godot`: 
+1. Clone `godot`:
 > `git clone https://github.com/godotengine/godot`
 2. Clone this repository into Godot's `modules/` folder.
 > `cd godot/modules && git clone https://github.com/summertimejordi/fmod_gd4`
 3. Download [FMOD Engine](https://www.fmod.com/download#FMOD%20Engine-select)
-3. Copy FMOD API folders to the `api` folder in the `fmod_gd4` module.
+4. Copy FMOD API folders to the `api` folder in the `fmod_gd4` module.
 5. [Compile Godot](https://docs.godotengine.org/en/latest/development/compiling/introduction_to_the_buildsystem.html?highlight=compile)
+
+**Not done yet!**
+Your newly built version of Godot will need to have the following libraries included in the same folder as it.
+
+Locate the libraries by navigating to the `api` folder you copied into the module path.
+
+**You will need:**
+		The Fmod library located in `core/lib`, and the Fmod Studio library located in `studio/lib`.
+
+You'll see folders named after the architecture they're designed for. (x86 for 32-Bit, x64 for 64-bit, and arm for Mac Sillicon)
+
+**On Windows:**
+	Copy `fmodL.dll` and `fmodstudioL.dll` to your Godot location.
+
+**On Mac and Linux:**
+	Copy `libfmodL.so` and `libfmodstudioL.so` to your Godot location.
+
+**This process can be confusing. Create an issue or DM me on Discord `jordi ★#0317` for further support!**
 
 # Usage
 * Configure FMOD by visting `Project Settings/Fmod`
 > Bank paths are relative to "res://": For example: we'd change `res://banks/Master.bank` to just `banks/Master.bank`. Autoinitialization automatically adds `.bank`, omit it when changing "Banks to load" (`Fmod/config/banks_to_load` in `ProjectSettings`)
-* Create event instances using 
+* Create event instances using
 ```py
 Fmod.create_event_instance(String event_path, bool autoplay, bool oneshot); # Returns FmodEventInstance
 ```
@@ -59,7 +77,7 @@ func _ready():
 	load_bank("banks/Master.strings.bank", FmodManager.NORMAL_LOAD);
 	load_bank("banks/Music.bank", FmodManager.NORMAL_LOAD);
 	load_bank("banks/SFX.bank", FmodManager.NORMAL_LOAD);
-	
+
 	main_vca = get_vca("vca:/Main");
 	music_vca = get_vca("vca:/Music");
 	sfx_vca = get_vca("vca:/SFX");
