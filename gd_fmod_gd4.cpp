@@ -157,7 +157,7 @@ Error FmodManager::load_bank(String path_relative_to_project_root, BankLoadFlags
 }
 
 void FmodManager::randomize_seed() {
-	ERR_FAIL_COND_V_MSG(!initialized, ERR_UNCONFIGURED, "Unable to randomize FMOD seed. FMOD not initalized!");
+	ERR_FAIL_COND_MSG(!initialized, "Unable to randomize FMOD seed. FMOD not initalized!");
     FMOD_ADVANCEDSETTINGS *advancedSettings = new FMOD_ADVANCEDSETTINGS();
     advancedSettings->cbSize = sizeof(FMOD_ADVANCEDSETTINGS);
     time_t seed;
@@ -212,7 +212,7 @@ float FmodManager::get_global_parameter(String p_name) {
 	ERR_FAIL_COND_V_MSG(!initialized, -1.0, vformat("FMOD not initalized. Could not set global paramter %s", p_name));
 	float r = 0;
 	FMOD_RESULT result = f_system->getParameterByName(p_name.utf8(), 0, &r);
-	ERR_FAIL_COND_MSG(result != FMOD_OK, vformat("An error occured while getting Global Parameter. FMOD_RESULT Error Code: %s", static_cast<int>(result)));
+	ERR_FAIL_COND_V_MSG(result != FMOD_OK, -1.0, vformat("An error occured while getting Global Parameter. FMOD_RESULT Error Code: %s", static_cast<int>(result)));
 	return r;
 }
 

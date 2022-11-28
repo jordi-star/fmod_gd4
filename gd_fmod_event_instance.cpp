@@ -138,7 +138,7 @@ float FmodEventInstance::get_parameter(String p_name) {
 	ERR_FAIL_COND_V_MSG(_event_instance == nullptr, -1.0, vformat("Event instance invalid. Could not get paramter %s", p_name));
 	float r = 0;
 	FMOD_RESULT result = _event_instance->getParameterByName(p_name.utf8(), 0, &r);
-	ERR_FAIL_COND_MSG(result != OK, vformat("An error occured while getting parameter %s on %s. FMOD_RESULT Error Code: %s", p_name, event_path, static_cast<int>(result)));
+	ERR_FAIL_COND_V_MSG(result != OK, -1.0, vformat("An error occured while getting parameter %s on %s. FMOD_RESULT Error Code: %s", p_name, event_path, static_cast<int>(result)));
 	return r;
 }
 
