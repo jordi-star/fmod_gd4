@@ -12,129 +12,102 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 FmodManager * FmodManager::singleton;
 
 FmodManager* FmodManager::get_singleton() {
-    if(!Engine::get_singleton()->is_editor_hint()) {
-        if(GLOBAL_GET("fmod/config/auto_initialize")) {
-            print_line("Auto-initializing FMOD. Visit \"Project Settings/Fmod\" to configure.");
-            singleton->initialize(GLOBAL_GET("fmod/config/max_channels"), static_cast<InitFlags>(GLOBAL_GET("fmod/config/initialization_mode").operator unsigned int()));
-            PackedStringArray banks = GLOBAL_GET("fmod/config/banks_to_load").operator PackedStringArray();
-            
-            Array failed_banks = Array();
+    if(Engine::get_singleton()->is_editor_hint()) {
+    	return singleton;
+    }
+    if(!GLOBAL_GET("fmod/config/auto_initialize")) {
+    	return singleton;
+    }
+    print_line("Auto-initializing FMOD. Visit \"Project Settings/Fmod\" to configure.");
+    Error result = singleton->initialize(GLOBAL_GET("fmod/config/max_channels"), static_cast<InitFlags>(GLOBAL_GET("fmod/config/initialization_mode").operator unsigned int()));
+	ERR_FAIL_COND_V_MSG(result != OK, singleton, vformat("An error occured while auto-initializing FMOD. Error Code: %s", result));
+    PackedStringArray banks = GLOBAL_GET("fmod/config/banks_to_load").operator PackedStringArray();
 
-            for(int i = 0; i < banks.size();i++) {
-                print_line("Loading bank -> " + banks[i] + ".bank");
-                Error e = singleton->load_bank(banks[i] + ".bank", NORMAL_LOAD);
-                if(e) {
-                    failed_banks.append(banks[i]);
-                }
-            }
-            if(failed_banks.size() > 0) {
-                print_line(vformat("Some banks failed to load: ", failed_banks));
-            }
+    Array failed_banks = Array();
+    for(int i = 0; i < banks.size();i++) {
+        print_line("Loading bank -> " + banks[i] + ".bank");
+        Error e = singleton->load_bank(banks[i] + ".bank", NORMAL_LOAD);
+        if(e != OK) {
+            failed_banks.append(banks[i]);
         }
+    }
+    if(failed_banks.size() > 0) {
+        print_line(vformat("Some banks failed to load: ", failed_banks));
     }
     return singleton;
 }
 
 Error FmodManager::initialize(int max_channels, InitFlags studio_flags) {
-    if(!initialized) {
-        FMOD_RESULT result = FMOD::Studio::System::create(&f_system);
-        if(result != FMOD_RESULT::FMOD_OK) {
-            print_line("An error occurred while trying to create the Fmod Studio System. " + vformat("Error code: %s", itos(static_cast<int>(result))));
-            return ERR_CANT_CREATE;
-        }
+	ERR_FAIL_COND_V_MSG(initialized, ERR_ALREADY_IN_USE, "Fmod is already initalized!");
+    FMOD_RESULT result = FMOD::Studio::System::create(&f_system);
+    ERR_FAIL_COND_V_MSG(result != FMOD_RESULT::FMOD_OK, ERR_CANT_CREATE, vformat("An error occurred while trying to create the Fmod Studio System. Error code: %s", itos(static_cast<int>(result))));
 
-        FMOD_STUDIO_INITFLAGS init_flag;
-
-        switch (studio_flags) {
-            case NORMAL: {
-                init_flag = FMOD_STUDIO_INIT_NORMAL;
-            } break;
-            case LIVE_UPDATE: {
-                init_flag = FMOD_STUDIO_INIT_LIVEUPDATE;
-            } break;
-            case ALLOW_MISSING_PLUGINS: {
-                init_flag = FMOD_STUDIO_INIT_ALLOW_MISSING_PLUGINS;
-            } break;
-            case SYNCHRONOUS_UPDATE: {
-                init_flag = FMOD_STUDIO_INIT_SYNCHRONOUS_UPDATE;
-            } break;
-            case DEFERRED_CALLBACKS: {
-                init_flag = FMOD_STUDIO_INIT_DEFERRED_CALLBACKS;
-            } break;
-            case LOAD_FROM_UPDATE: {
-                init_flag = FMOD_STUDIO_INIT_LOAD_FROM_UPDATE;
-            } break;
-            case MEMORY_TRACKING: {
-                init_flag = FMOD_STUDIO_INIT_MEMORY_TRACKING;
-            } break;
-        }
-
-        result = f_system->initialize(max_channels, init_flag, FMOD_INIT_NORMAL, 0);
-        if(result != FMOD_RESULT::FMOD_OK) {
-            print_line("An error occurred while trying to initialize the Fmod Studio System." + vformat("Error code: %s", itos(static_cast<int>(result))));
-            return ERR_CANT_CREATE;
-        }
-        else {
-            initialized = true;
-			randomize_seed();
-			set_process_internal(true);
-			set_process(true);
-            print_line("Initialized FMOD successfully.");
-            return OK;
-        }
+    FMOD_STUDIO_INITFLAGS init_flag;
+    switch (studio_flags) {
+        case NORMAL: {
+            init_flag = FMOD_STUDIO_INIT_NORMAL;
+        } break;
+        case LIVE_UPDATE: {
+            init_flag = FMOD_STUDIO_INIT_LIVEUPDATE;
+        } break;
+        case ALLOW_MISSING_PLUGINS: {
+            init_flag = FMOD_STUDIO_INIT_ALLOW_MISSING_PLUGINS;
+        } break;
+        case SYNCHRONOUS_UPDATE: {
+           init_flag = FMOD_STUDIO_INIT_SYNCHRONOUS_UPDATE;
+        } break;
+        case DEFERRED_CALLBACKS: {
+            init_flag = FMOD_STUDIO_INIT_DEFERRED_CALLBACKS;
+        } break;
+        case LOAD_FROM_UPDATE: {
+            init_flag = FMOD_STUDIO_INIT_LOAD_FROM_UPDATE;
+        } break;
+        case MEMORY_TRACKING: {
+            init_flag = FMOD_STUDIO_INIT_MEMORY_TRACKING;
+        } break;
     }
-    else {
-        return ERR_ALREADY_IN_USE;
-    }
+
+    result = f_system->initialize(max_channels, init_flag, FMOD_INIT_NORMAL, 0);
+    ERR_FAIL_COND_V_MSG(result != FMOD_RESULT::FMOD_OK, ERR_CANT_CREATE, vformat("An error occurred while trying to initialize the Fmod Studio System. Error code: %s", itos(static_cast<int>(result))));
+    initialized = true;
+	randomize_seed();
+	set_process_internal(true);
+	set_process(true);
+    print_line("Initialized FMOD successfully.");
+    return OK;
 }
 
 FmodEventInstance* FmodManager::create_event_instance(String event_path, bool autoplay, bool one_shot) {
-    if(initialized) {
-
-
-        if(get_parent() == nullptr) {
-            set_name("FMOD Manager");
-            OS::get_singleton()->get_main_loop()->call("get_root").call("add_child", this);
-            set_name("FMOD Manager");
-        }
-
-        FMOD::Studio::EventDescription *e_desc = nullptr;
-        f_system->getEvent(event_path.utf8().get_data(), &e_desc);
-        if(e_desc) {
-            FMOD::Studio::EventInstance *e_instance = nullptr;
-            e_desc->createInstance(&e_instance);
-            if(e_instance) {
-                randomize_seed();
-                FmodEventInstance* event = memnew(FmodEventInstance);
-                //event->manager = *this;
-                event->_event_instance = e_instance;
-                event->set_process_mode(PROCESS_MODE_ALWAYS);
-				event->set_callback();
-				event->set_process(true);
-                event->set_name(event_path);
-				event->event_path = event_path;
-				event->one_shot = one_shot;
-				add_child(event);
-                if(autoplay) {
-					event->play();
-					print_line(vformat("Playing instance. ", event_path));
-                }
-                events.append(event);
-                return event;
-            }
-            else {
-                print_line(vformat("Could not create Event Instance for: %s", event_path));
-                return nullptr;
-            }
-        }
-        else {
-            print_line(vformat("Could not get EventDescription for: %s", event_path));
-            return nullptr;
-        }
+	ERR_FAIL_COND_V_MSG(!initialized, nullptr, "Unable to create Event Instance. Fmod not initalized!");
+    if (get_parent() == nullptr) {
+        set_name("FMOD Manager");
+        OS::get_singleton()->get_main_loop()->call("get_root").call("add_child", this);
+        set_name("FMOD Manager");
     }
-    else {
-        return nullptr;
+
+    FMOD::Studio::EventDescription *e_desc = nullptr;
+    FMOD_RESULT result = f_system->getEvent(event_path.utf8().get_data(), &e_desc);
+	ERR_FAIL_COND_V_MSG(!e_desc, nullptr, vformat("Could not get EventDescription for: %s. FMOD_RESULT Error Code: %s", event_path, result));
+
+    FMOD::Studio::EventInstance *e_instance = nullptr;
+    e_desc->createInstance(&e_instance);
+	ERR_FAIL_COND_V_MSG(!e_instance, nullptr, vformat("Could not create Event Instance for: %s. FMOD_RESULT Error Code: %s", event_path, static_cast<int>(result)));
+
+    randomize_seed();
+    FmodEventInstance* event = memnew(FmodEventInstance);
+    event->_event_instance = e_instance;
+    event->set_process_mode(PROCESS_MODE_ALWAYS);
+	event->set_callback();
+	event->set_process(true);
+    event->set_name(event_path);
+	event->event_path = event_path;
+	event->one_shot = one_shot;
+	add_child(event);
+    if (autoplay) {
+		event->play();
     }
+    events.append(event);
+    return event;
 }
 
 FmodVCA* FmodManager::get_vca(String vca_path) {
@@ -153,60 +126,46 @@ FmodEventInstance* FmodManager::play(String event_path) {
 }
 
 Error FmodManager::load_bank(String path_relative_to_project_root, BankLoadFlags flags) {
-    if(initialized) {
-        if (!path_relative_to_project_root.begins_with("./")) {
-            path_relative_to_project_root = "./" + path_relative_to_project_root;
-        }
-        if(loaded_banks.has(path_relative_to_project_root)) {
-            return ERR_ALREADY_EXISTS;
-        }
-        FMOD::Studio::Bank *bank = nullptr;
-
-        FMOD_STUDIO_LOAD_BANK_FLAGS load_flag;
-
-        switch (flags) {
-            case NORMAL_LOAD: {
-                load_flag = FMOD_STUDIO_LOAD_BANK_NORMAL;
-            }
-                break;
-            case NONBLOCKING: {
-                load_flag = FMOD_STUDIO_LOAD_BANK_NONBLOCKING;
-            }
-                break;
-            case DECOMPRESS_SAMPLES: {
-                load_flag = FMOD_STUDIO_LOAD_BANK_DECOMPRESS_SAMPLES;
-            }
-                break;
-            case UNENCRYPTED: {
-                load_flag = FMOD_STUDIO_LOAD_BANK_UNENCRYPTED;
-            }
-                break;
-        }
-
-        f_system->loadBankFile(path_relative_to_project_root.utf8().get_data(), load_flag, &bank);
-        if (bank) {
-            loaded_banks.insert(path_relative_to_project_root, bank);
-            return OK;
-        } else {
-            return ERR_CANT_OPEN;
-        }
+	ERR_FAIL_COND_V_MSG(!initialized, ERR_UNCONFIGURED, "Unable to create load bank. Fmod not initalized!");
+    if (!path_relative_to_project_root.begins_with("./")) {
+        path_relative_to_project_root = "./" + path_relative_to_project_root;
     }
-    else {
-        return ERR_ALREADY_IN_USE;
+	ERR_FAIL_COND_V_MSG(loaded_banks.has(path_relative_to_project_root), ERR_ALREADY_EXISTS, vformat("Unable to create load bank. Bank at '%s' already loaded!", path_relative_to_project_root));
+    FMOD::Studio::Bank *bank = nullptr;
+
+    FMOD_STUDIO_LOAD_BANK_FLAGS load_flag;
+
+    switch (flags) {
+		case NORMAL_LOAD: {
+				load_flag = FMOD_STUDIO_LOAD_BANK_NORMAL;
+			} break;
+		case NONBLOCKING: {
+			load_flag = FMOD_STUDIO_LOAD_BANK_NONBLOCKING;
+			} break;
+		case DECOMPRESS_SAMPLES: {
+			load_flag = FMOD_STUDIO_LOAD_BANK_DECOMPRESS_SAMPLES;
+			} break;
+		case UNENCRYPTED: {
+			load_flag = FMOD_STUDIO_LOAD_BANK_UNENCRYPTED;
+			} break;
     }
+
+    FMOD_RESULT result = f_system->loadBankFile(path_relative_to_project_root.utf8().get_data(), load_flag, &bank);
+	ERR_FAIL_COND_V_MSG(!bank, ERR_CANT_OPEN, vformat("Unable to create load bank. FMOD_RESULT error code: %s", static_cast<int>(result)));
+    loaded_banks.insert(path_relative_to_project_root, bank);
+    return OK;
 }
 
 void FmodManager::randomize_seed() {
-    if(initialized) {
-        FMOD_ADVANCEDSETTINGS *advancedSettings = new FMOD_ADVANCEDSETTINGS();
-        advancedSettings->cbSize = sizeof(FMOD_ADVANCEDSETTINGS);
-        time_t seed;
-        time(&seed);
-        advancedSettings->randomSeed = seed;
-        FMOD::System *core = nullptr;
-        f_system->getCoreSystem(&core);
-        core->setAdvancedSettings(advancedSettings);
-    }
+	ERR_FAIL_COND_V_MSG(!initialized, ERR_UNCONFIGURED, "Unable to randomize FMOD seed. FMOD not initalized!");
+    FMOD_ADVANCEDSETTINGS *advancedSettings = new FMOD_ADVANCEDSETTINGS();
+    advancedSettings->cbSize = sizeof(FMOD_ADVANCEDSETTINGS);
+    time_t seed;
+    time(&seed);
+    advancedSettings->randomSeed = seed;
+    FMOD::System *core = nullptr;
+    f_system->getCoreSystem(&core);
+    core->setAdvancedSettings(advancedSettings);
 }
 
 void FmodManager::_bind_methods() {
@@ -234,7 +193,6 @@ void FmodManager::_bind_methods() {
     BIND_ENUM_CONSTANT(NONBLOCKING);
     BIND_ENUM_CONSTANT(DECOMPRESS_SAMPLES);
     BIND_ENUM_CONSTANT(UNENCRYPTED);
-    //ADD_ARRAY()
 }
 
 Array FmodManager::get_events() {
@@ -246,20 +204,15 @@ void FmodManager::set_events(Array a) {
 }
 
 void FmodManager::set_global_parameter(String p_name, float p_value) {
-	if(!initialized) {
-		print_line(vformat("FMOD not initalized. Could not set global paramter %s", p_name));
-		return;
-	}
+	ERR_FAIL_COND_MSG(!initialized, vformat("FMOD not initalized. Could not set global paramter %s", p_name));
 	f_system->setParameterByName(p_name.utf8(), p_value);
 }
 
 float FmodManager::get_global_parameter(String p_name) {
-	if(!initialized) {
-		print_line(vformat("FMOD not initalized. Could not get global paramter %s", p_name));
-		return -1.0;
-	}
+	ERR_FAIL_COND_V_MSG(!initialized, -1.0, vformat("FMOD not initalized. Could not set global paramter %s", p_name));
 	float r = 0;
-	f_system->getParameterByName(p_name.utf8(), 0, &r);
+	FMOD_RESULT result = f_system->getParameterByName(p_name.utf8(), 0, &r);
+	ERR_FAIL_COND_MSG(result != FMOD_OK, vformat("An error occured while getting Global Parameter. FMOD_RESULT Error Code: %s", static_cast<int>(result)));
 	return r;
 }
 
@@ -288,11 +241,12 @@ FmodManager::FmodManager() {
         singleton = this;
     }
     else {
-		if(singleton != this) {
-			if(!Engine::get_singleton()->is_editor_hint()) {
-				singleton->queue_free();
-				singleton = this;
-			}
+		if(singleton == this) {
+			return;
+		}
+		if(!Engine::get_singleton()->is_editor_hint()) {
+			singleton->queue_free();
+			singleton = this;
 		}
     }
 }

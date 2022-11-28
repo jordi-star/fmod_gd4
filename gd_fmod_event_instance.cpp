@@ -59,65 +59,59 @@ FMOD_RESULT F_CALLBACK FmodEventInstance::fmod_callback(FMOD_STUDIO_EVENT_CALLBA
 }
 
 void FmodEventInstance::play() {
-	if(_event_instance != nullptr) {
-		PlaybackState state = get_playback_state();
-		if(state != PLAYING && state != PAUSED) {
-			_event_instance->start();
-		}
-		else {
-			_event_instance->setPaused(false);
-		}
-	}
-	else {
+	if(_event_instance == nullptr) {
 		queue_free();
+		return;
 	}
+	PlaybackState state = get_playback_state();
+	if(state == PAUSED) {
+		_event_instance->setPaused(false);
+		return;
+	}
+	_event_instance->start();
 }
+
 void FmodEventInstance::pause() {
-	if(_event_instance != nullptr) {
-		PlaybackState state = get_playback_state();
-		if(state != PAUSED) {
-			_event_instance->setPaused(true);
-		}
+	if(_event_instance == nullptr) {
+		return;
+	}
+	PlaybackState state = get_playback_state();
+	if(state != PAUSED) {
+		_event_instance->setPaused(true);
 	}
 }
 
 FmodEventInstance::PlaybackState FmodEventInstance::get_playback_state() {
-    if(_event_instance != nullptr) {
-        FMOD_STUDIO_PLAYBACK_STATE p_state = FMOD_STUDIO_PLAYBACK_STOPPED;
-        _event_instance->getPlaybackState(&p_state);
-
-        PlaybackState state_to_return;
-        switch(p_state) {
-			case FMOD_STUDIO_PLAYBACK_PLAYING: {
-				state_to_return = PLAYING;
-			} break;
-			case FMOD_STUDIO_PLAYBACK_SUSTAINING: {
-				state_to_return = PAUSED;
-			} break;
-            case FMOD_STUDIO_PLAYBACK_STOPPING: {
-                state_to_return = STOPPING;
-            } break;
-            case FMOD_STUDIO_PLAYBACK_STOPPED: {
-                state_to_return = STOPPED;
-            } break;
-		}
-		return state_to_return;
-	} else {
+    if(_event_instance == nullptr) {
+		queue_free();
 		return PlaybackState::STOPPED;
 	}
+    FMOD_STUDIO_PLAYBACK_STATE p_state = FMOD_STUDIO_PLAYBACK_STOPPED;
+    _event_instance->getPlaybackState(&p_state);
+
+    PlaybackState state_to_return;
+    switch(p_state) {
+		case FMOD_STUDIO_PLAYBACK_PLAYING: {
+			state_to_return = PLAYING;
+		} break;
+		case FMOD_STUDIO_PLAYBACK_SUSTAINING: {
+			state_to_return = PAUSED;
+		} break;
+        case FMOD_STUDIO_PLAYBACK_STOPPING: {
+            state_to_return = STOPPING;
+        } break;
+        case FMOD_STUDIO_PLAYBACK_STOPPED: {
+            state_to_return = STOPPED;
+        } break;
+	}
+	return state_to_return;
 }
 
 void FmodEventInstance::stop(bool stop_immediately) {
-    if(_event_instance != nullptr) {
-        FMOD_STUDIO_STOP_MODE stop_mode;
-        if(stop_immediately) {
-            stop_mode = FMOD_STUDIO_STOP_IMMEDIATE;
-        }
-        else {
-            stop_mode = FMOD_STUDIO_STOP_ALLOWFADEOUT;
-        }
-        _event_instance->stop(stop_mode);
+    if(_event_instance == nullptr) {
+		return;
     }
+    _event_instance->stop(stop_immediately ? FMOD_STUDIO_STOP_IMMEDIATE : FMOD_STUDIO_STOP_ALLOWFADEOUT);
 }
 
 void FmodEventInstance::release_event() {
@@ -135,20 +129,16 @@ void FmodEventInstance::perform_release() {
 }
 
 void FmodEventInstance::set_parameter(String p_name, float p_value) {
-	if(_event_instance == nullptr) {
-		print_line(vformat("Event instance invalid. Could not set paramter %s", p_name));
-		return;
-	}
-	_event_instance->setParameterByName(p_name.utf8(), p_value);
+	ERR_FAIL_COND_MSG(_event_instance == nullptr, vformat("Event instance invalid. Could not set paramter %s", p_name));
+	FMOD_RESULT result = _event_instance->setParameterByName(p_name.utf8(), p_value);
+	ERR_FAIL_COND_MSG(result != OK, vformat("An error occured while setting parameter %s on %s. FMOD_RESULT Error Code: %s", p_name, event_path, static_cast<int>(result)));
 }
 
 float FmodEventInstance::get_parameter(String p_name) {
-	if(_event_instance == nullptr) {
-		print_line(vformat("Event instance invalid. Could not get paramter %s", p_name));
-		return -1.0;
-	}
+	ERR_FAIL_COND_V_MSG(_event_instance == nullptr, -1.0, vformat("Event instance invalid. Could not get paramter %s", p_name));
 	float r = 0;
-	_event_instance->getParameterByName(p_name.utf8(), 0, &r);
+	FMOD_RESULT result = _event_instance->getParameterByName(p_name.utf8(), 0, &r);
+	ERR_FAIL_COND_MSG(result != OK, vformat("An error occured while getting parameter %s on %s. FMOD_RESULT Error Code: %s", p_name, event_path, static_cast<int>(result)));
 	return r;
 }
 
