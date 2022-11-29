@@ -126,7 +126,7 @@ FmodEventInstance* FmodManager::play(String event_path) {
 }
 
 Error FmodManager::load_bank(String path_relative_to_project_root, BankLoadFlags flags) {
-	ERR_FAIL_COND_V_MSG(!initialized, ERR_UNCONFIGURED, "Unable to create load bank. Fmod not initalized!");
+	ERR_FAIL_COND_V_MSG(!initialized, ERR_UNCONFIGURED, "Unable to load bank. Fmod not initalized!");
     if (!path_relative_to_project_root.begins_with("./")) {
         path_relative_to_project_root = "./" + path_relative_to_project_root;
     }
