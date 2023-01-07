@@ -32,7 +32,7 @@ void initialize_fmod_gd4_module(ModuleInitializationLevel p_level) {
 				GLOBAL_DEF("fmod/config/auto_initialize", true);
 				GLOBAL_DEF("fmod/config/max_channels", 1024);
 				GLOBAL_DEF("fmod/config/initialization_mode", 0);
-				ProjectSettings::get_singleton()->set_custom_property_info("fmod/config/initialization_mode", PropertyInfo(Variant::INT, "initialization_mode", PROPERTY_HINT_ENUM, "NORMAL,LIVE_UPDATE,ALLOW_MISSING_PLUGINS,SYNCHRONOUS_UPDATE,DEFERRED_CALLBACKS,LOAD_FROM_UPDATE,MEMORY_TRACKING"));
+				ProjectSettings::get_singleton()->set_custom_property_info(PropertyInfo(Variant::INT, "fmod/config/initialization_mode", PROPERTY_HINT_ENUM, "NORMAL,LIVE_UPDATE,ALLOW_MISSING_PLUGINS,SYNCHRONOUS_UPDATE,DEFERRED_CALLBACKS,LOAD_FROM_UPDATE,MEMORY_TRACKING"));
 				PackedStringArray init_banks = PackedStringArray();
 				init_banks.append("Master");
 				init_banks.append("Master.strings");
