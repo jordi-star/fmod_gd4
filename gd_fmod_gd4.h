@@ -73,6 +73,7 @@ public:
     void randomize_seed();
 
     FmodManager();
+    ~FmodManager();
 };
 
 VARIANT_ENUM_CAST(FmodManager::InitFlags);
