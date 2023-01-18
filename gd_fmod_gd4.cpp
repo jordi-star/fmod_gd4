@@ -44,9 +44,6 @@ Error FmodManager::initialize(int max_channels, InitFlags studio_flags) {
 
     FMOD_STUDIO_INITFLAGS init_flag;
     switch (studio_flags) {
-        case NORMAL: {
-            init_flag = FMOD_STUDIO_INIT_NORMAL;
-        } break;
         case LIVE_UPDATE: {
             init_flag = FMOD_STUDIO_INIT_LIVEUPDATE;
         } break;
@@ -64,6 +61,9 @@ Error FmodManager::initialize(int max_channels, InitFlags studio_flags) {
         } break;
         case MEMORY_TRACKING: {
             init_flag = FMOD_STUDIO_INIT_MEMORY_TRACKING;
+        } break;
+        default: {
+            init_flag = FMOD_STUDIO_INIT_NORMAL;
         } break;
     }
 
@@ -134,20 +134,19 @@ Error FmodManager::load_bank(String path_relative_to_project_root, BankLoadFlags
     FMOD::Studio::Bank *bank = nullptr;
 
     FMOD_STUDIO_LOAD_BANK_FLAGS load_flag;
-
     switch (flags) {
-		case NORMAL_LOAD: {
-				load_flag = FMOD_STUDIO_LOAD_BANK_NORMAL;
-			} break;
 		case NONBLOCKING: {
 			load_flag = FMOD_STUDIO_LOAD_BANK_NONBLOCKING;
-			} break;
+		} break;
 		case DECOMPRESS_SAMPLES: {
 			load_flag = FMOD_STUDIO_LOAD_BANK_DECOMPRESS_SAMPLES;
-			} break;
+		} break;
 		case UNENCRYPTED: {
 			load_flag = FMOD_STUDIO_LOAD_BANK_UNENCRYPTED;
-			} break;
+		} break;
+		default: {
+				load_flag = FMOD_STUDIO_LOAD_BANK_NORMAL;
+		} break;
     }
 
     FMOD_RESULT result = f_system->loadBankFile(path_relative_to_project_root.utf8().get_data(), load_flag, &bank);

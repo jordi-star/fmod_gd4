@@ -89,7 +89,7 @@ FmodEventInstance::PlaybackState FmodEventInstance::get_playback_state() {
     FMOD_STUDIO_PLAYBACK_STATE p_state = FMOD_STUDIO_PLAYBACK_STOPPED;
     _event_instance->getPlaybackState(&p_state);
 
-    PlaybackState state_to_return;
+    PlaybackState state_to_return = STOPPED;
     switch(p_state) {
 		case FMOD_STUDIO_PLAYBACK_PLAYING: {
 			state_to_return = PLAYING;
