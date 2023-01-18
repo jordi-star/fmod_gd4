@@ -72,7 +72,6 @@ Error FmodManager::initialize(int max_channels, InitFlags studio_flags) {
     initialized = true;
 	randomize_seed();
 	set_process_internal(true);
-	set_process(true);
     print_line("Initialized FMOD successfully.");
     return OK;
 }
@@ -226,12 +225,6 @@ void FmodManager::_notification(int p_what) {
         case NOTIFICATION_INTERNAL_PROCESS: {
             run_callbacks();
         } break;
-        case NOTIFICATION_PREDELETE: {
-            if(initialized) {
-                f_system->release();
-                memdelete(&f_system);
-            }
-        } break;
     }
 }
 
@@ -247,5 +240,11 @@ FmodManager::FmodManager() {
 			singleton->queue_free();
 			singleton = this;
 		}
+    }
+}
+
+FmodManager::~FmodManager() {
+    if(initialized) {
+       f_system->release();
     }
 }

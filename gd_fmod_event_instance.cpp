@@ -170,19 +170,19 @@ void FmodEventInstance::_notification(int p_notification) {
 		}
 	}
 	current_callback = -1;
-	if(one_shot) {
-		//print_line(vformat("Oneshot", 0));
-		FMOD_STUDIO_PLAYBACK_STATE state = FMOD_STUDIO_PLAYBACK_STOPPED;
-		FMOD_RESULT f = _event_instance->getPlaybackState(&state);
-		if (f == FMOD_OK) {
-			if (state == FMOD_STUDIO_PLAYBACK_STOPPED) {
-				perform_release();
-			}
-		}
-		else {
-			perform_release();
-		}
-	}
+	// if(one_shot) {
+	// 	//print_line(vformat("Oneshot", 0));
+	// 	FMOD_STUDIO_PLAYBACK_STATE state = FMOD_STUDIO_PLAYBACK_STOPPED;
+	// 	FMOD_RESULT f = _event_instance->getPlaybackState(&state);
+	// 	if (f == FMOD_OK) {
+	// 		if (state == FMOD_STUDIO_PLAYBACK_STOPPED) {
+	// 			perform_release();
+	// 		}
+	// 	}
+	// 	else {
+	// 		perform_release();
+	// 	}
+	// }
 }
 //
 //bool FmodEventInstance::unreference() {
