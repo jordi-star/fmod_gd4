@@ -1,83 +1,114 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<class name="FmodEventInstance" inherits="Node" version="4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
+<class name="FmodEventInstance" inherits="RefCounted" version="4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../doc/class.xsd">
 	<brief_description>
 	</brief_description>
 	<description>
+	A wrapper class for the [url=https://www.fmod.com/docs/2.01/api/studio-api-eventinstance.html]FMOD Studio Event Instance[/url].
+	From the [url=https://www.fmod.com/docs/2.01/api/studio-guide.html#playing-events]FMOD Studio API Guide[/url]:
+	"An event is an instanceable unit of sound content that can be triggered, controlled and stopped from game code. Everything that produces a sound in a game should have a corresponding event."
 	</description>
 	<tutorials>
 	</tutorials>
 	<methods>
+		<method name="create" qualifiers="static">
+			<return type="FmodEventInstance" />
+			<param index="0" name="event_path" type="String" />
+			<description>
+			Creates and initializes an [FmodEventInstance].
+			</description>
+		</method>
 		<method name="get_parameter">
 			<return type="float" />
-			<argument index="0" name="arg0" type="String" />
+			<param index="0" name="_unnamed_arg0" type="String" />
 			<description>
+				Excerpt from the [url=https://www.fmod.com/docs/2.00/api/studio-api-eventinstance.html#studio_eventinstance_getparameterbyname]FMOD Documentation[/url]:
+				"Automatic parameters always return value as 0 since they can never have their value set from the public API.
+
+				[Returned value] is the final value of the parameter after applying adjustments due to automation, modulation, seek speed, and parameter velocity to value. This is calculated asynchronously when the Studio system updates."
 			</description>
 		</method>
 		<method name="get_playback_state">
 			<return type="int" enum="FmodEventInstance.PlaybackState" />
 			<description>
+				Excerpt from the [url=https://www.fmod.com/docs/2.00/api/studio-api-eventinstance.html#studio_eventinstance_getplaybackstate]FMOD Documentation[/url]:
+				"You can poll this function to track the playback state of an event instance.
+
+				If the instance is invalid, then the state will be set to [[constant FmodEventInstance.STOPPED]]."
+			</description>
+		</method>
+		<method name="initialize">
+			<return type="int" enum="Error" />
+			<param index="0" name="event_path" type="String" />
+			<description>
+			Initializes the event instance with the [param event_path] provided. Event instances cannot be initialzed multiple times.
 			</description>
 		</method>
 		<method name="pause">
 			<return type="void" />
 			<description>
-			</description>
-		</method>
-		<method name="perform_release">
-			<return type="void" />
-			<description>
+				Pauses the event instance.
 			</description>
 		</method>
 		<method name="play">
 			<return type="void" />
 			<description>
-			</description>
-		</method>
-		<method name="release_event">
-			<return type="void" />
-			<description>
+				Starts playback of the event instance. See the [url=https://www.fmod.com/docs/2.00/api/studio-api-eventinstance.html#studio_eventinstance_start]FMOD Documentation[/url].
+
+				If the event instance is paused, this will instead resume playback.
 			</description>
 		</method>
 		<method name="set_parameter">
 			<return type="void" />
-			<argument index="0" name="name" type="String" />
-			<argument index="1" name="value" type="float" />
+			<param index="0" name="name" type="String" />
+			<param index="1" name="value" type="float" />
 			<description>
+				Sets a parameter on the event instance by name.
+				If the specified parameter is an automatic parameter or doesn't exist, the method will print an error.
 			</description>
 		</method>
 		<method name="stop">
 			<return type="void" />
-			<argument index="0" name="stop_immediately" type="bool" />
+			<param index="0" name="stop_immediately" type="bool" />
 			<description>
+				Stops the event instance.
 			</description>
 		</method>
 	</methods>
 	<members>
 		<member name="event_path" type="String" setter="set_event_path" getter="get_event_path" default="&quot;&quot;">
+			The path this instance will play.
+			[b]Note:[/b] This property is Read Only. It's only set when the event is initialized.
 		</member>
 	</members>
 	<signals>
 		<signal name="event_beat">
 			<description>
+				Called when the timeline hits a beat in a tempo section.
 			</description>
 		</signal>
 		<signal name="event_started">
 			<description>
+				Called when the event is played.
 			</description>
 		</signal>
 		<signal name="event_stopped">
 			<description>
+				Called when the event has stopped.
 			</description>
 		</signal>
 	</signals>
 	<constants>
 		<constant name="PLAYING" value="0" enum="PlaybackState">
+			The event is playing.
 		</constant>
 		<constant name="PAUSED" value="1" enum="PlaybackState">
+			The event is paused.
 		</constant>
 		<constant name="STOPPING" value="2" enum="PlaybackState">
+			The event is stopping. (Fading out, etc)
 		</constant>
 		<constant name="STOPPED" value="3" enum="PlaybackState">
+			Not playing.
 		</constant>
 	</constants>
 </class>

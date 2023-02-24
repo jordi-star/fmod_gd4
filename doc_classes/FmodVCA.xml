@@ -3,13 +3,16 @@
 	<brief_description>
 	</brief_description>
 	<description>
+	A handle to an FMOD VCA.
 	</description>
 	<tutorials>
 	</tutorials>
 	<members>
 		<member name="path" type="String" setter="" getter="get_path" default="&quot;&quot;">
+			The FMOD path of this VCA.
 		</member>
 		<member name="volume" type="float" setter="set_volume" getter="get_volume" default="-1.0">
+			The volume of this VCA. See the [url=https://www.fmod.com/docs/2.01/api/studio-api-vca.html#studio_vca_setvolume]FMOD Documentation[/url].
 		</member>
 	</members>
 </class>

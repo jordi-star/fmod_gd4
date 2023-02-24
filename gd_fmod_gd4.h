@@ -38,6 +38,8 @@ public:
         LOAD_FROM_UPDATE,
         MEMORY_TRACKING
     };
+	const String INIT_FLAGS_PROPERTY_HINT = "NORMAL,LIVE_UPDATE,ALLOW_MISSING_PLUGINS,SYNCHRONOUS_UPDATE,DEFERRED_CALLBACKS,LOAD_FROM_UPDATE,MEMORY_TRACKING";
+
     enum BankLoadFlags {
         NORMAL_LOAD,
         NONBLOCKING,
@@ -47,28 +49,26 @@ public:
 
     static FmodManager* get_singleton();
 
-    FMOD::Studio::System *f_system;
+    FMOD::Studio::System *fmod_system;
 
-    VMap<String, FMOD::Studio::Bank*> loaded_banks;
-    Array events = Array();
-
-    Array get_events();
-    void set_events(Array a);
+    HashMap<String, FMOD::Studio::Bank*> loaded_banks;
+    Vector<FmodEventInstance *> events = Vector<FmodEventInstance *>();
 
 	void set_global_parameter(String p_name, float p_value);
 	float get_global_parameter(String p_name);
 
     bool initialized = false;
+	bool added_to_tree = false;
 
-    void run_callbacks();
     void _notification(int p_what);
-    Error initialize(int max_channels, InitFlags studio_flags);
+    Error initialize(InitFlags studio_flags, int max_channels);
+	void auto_initialize(InitFlags init_flags, TypedArray<String> banks_to_load, int max_channels);
+    void add_to_tree();
     Error load_bank(String path_relative_to_project_root, BankLoadFlags flags);
 
-	FmodEventInstance* create_event_instance(String event_path, bool autoplay = false, bool one_shot = false);
-    FmodVCA* get_vca(String vca_path);
-	FmodEventInstance* oneshot(String event_path, bool autoplay = false);
-    FmodEventInstance* play(String event_path); // Convenience function for ease of use, alias for oneshot(event_path, true)
+	Ref<FmodEventInstance> create_event_instance(String event_path);
+    Ref<FmodVCA> get_vca(String vca_path);
+    Ref<FmodEventInstance> play(String event_path);
 
     void randomize_seed();
 

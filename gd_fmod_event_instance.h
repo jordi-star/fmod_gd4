@@ -11,57 +11,53 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #ifndef GODOT_FMOD_EVENT_INSTANCE_H
 #define GODOT_FMOD_EVENT_INSTANCE_H
 
-#include "scene/main/node.h"
+#include "core/object/ref_counted.h"
 #include "api/core/inc/fmod.hpp"
 #include "api/studio/inc/fmod_studio.hpp"
 
-class FmodEventInstance : public Node {
-	GDCLASS(FmodEventInstance, Node);
+class FmodManager;
+class FmodEventInstance : public RefCounted {
+	GDCLASS(FmodEventInstance, RefCounted);
 
 protected:
     static void _bind_methods();
-    void _notification(int p_what);
+    FMOD::Studio::EventInstance *inner_event_instance = nullptr;
 
 public:
-    int current_callback = -1;
-    //auto manager;
-    FMOD::Studio::EventInstance *_event_instance = nullptr;
+    const bool is_instance_valid();
+
+    String event_path;
+
+    String get_event_path();
+    void set_event_path(const String path);
+
+    // Playback State
     enum PlaybackState {
 		PLAYING,
 		PAUSED,
         STOPPING,
         STOPPED
     };
-
-    String event_path;
-
-    String get_event_path();
-    void set_event_path(String path);
-
-    PlaybackState get_playback_state();
-	void stop(bool stop_immediately=false);
-	void set_parameter(String p_name, float p_value);
-	float get_parameter(String p_name);
-	void set_callback();
-    void release_event();
 	void play();
 	void pause();
+	void stop(const bool stop_immediately=false);
+    PlaybackState get_playback_state();
 
-	bool one_shot = false;
+    // Parameters
+	void set_parameter(const String p_name, const float p_value);
+	float get_parameter(const String p_name);
 
+    // Callbacks
+    FMOD_STUDIO_EVENT_CALLBACK_TYPE current_callback = -1;
     int current_beat = 0;
-
+	void activate_fmod_callback_reciever();
 	static FMOD_RESULT F_CALLBACK fmod_callback(FMOD_STUDIO_EVENT_CALLBACK_TYPE type, FMOD_STUDIO_EVENTINSTANCE *event, void *parameters);
+    const void process_current_callback();
 
+    Error initialize(const String event_path);
+    static Ref<FmodEventInstance> create(const String event_path);
     FmodEventInstance();
-
-    void perform_release();
-
-    void read_callback();
-
-    int get_signal();
-
-    void set_signal(int t);
+    ~FmodEventInstance();
 };
 
 VARIANT_ENUM_CAST(FmodEventInstance::PlaybackState);

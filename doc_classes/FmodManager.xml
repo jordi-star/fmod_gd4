@@ -3,96 +3,111 @@
 	<brief_description>
 	</brief_description>
 	<description>
+	A wrapper class for the [url=https://www.fmod.com/docs/2.01/api/studio-api-system.html]FMOD Studio System[/url].
+	Must be initialized before FMOD can be used.
 	</description>
 	<tutorials>
 	</tutorials>
 	<methods>
 		<method name="create_event_instance">
 			<return type="FmodEventInstance" />
-			<argument index="0" name="event_path" type="String" />
-			<argument index="1" name="autoplay" type="bool" />
-			<argument index="2" name="one_shot" type="bool" />
+			<param index="0" name="event_path" type="String" />
 			<description>
-				Create an FMOD Studio Event Instance. See [url="https://www.fmod.com/resources/documentation-api?version=2.02&amp;page=studio-api-eventinstance.html"]FMOD Docs[/url]
+				Create a [FmodEventInstance] from the [param event_path] provided.
 			</description>
 		</method>
-		<method name="get_events">
-			<return type="Array" />
+		<method name="get_global_parameter">
+			<return type="float" />
+			<param index="0" name="param_name" type="String" />
 			<description>
+				Excerpt from the [url=https://www.fmod.com/docs/2.00/api/studio-api-system.html#studio_system_getparameterbyname]FMOD Documentation[/url]:
+				"[Return value] is the final value of the parameter after applying adjustments due to automation, modulation, seek speed, and parameter velocity to value. This is calculated asynchronously when the Studio system updates."
 			</description>
 		</method>
 		<method name="get_vca">
 			<return type="FmodVCA" />
-			<argument index="0" name="vca_path" type="String" />
+			<param index="0" name="vca_path" type="String" />
 			<description>
-				Get an FMOD VCA. See [url="https://www.fmod.com/resources/documentation-api?version=2.02&amp;page=studio-api-vca.html"]FMOD Docs[/url]
+				Excerpt from the [url=https://www.fmod.com/docs/2.01/api/studio-api-system.html#studio_system_getvca]FMOD Documentation[/url]:
+				"This function allows you to retrieve a handle for any VCA in the global mixer.
+
+				path may be a path, such as vca:/MyVCA, or an ID string, such as {d9982c58-a056-4e6c-b8e3-883854b4bffb}.
+
+				Note that path lookups will only succeed if the strings bank has been loaded."
 			</description>
 		</method>
 		<method name="initialize">
 			<return type="int" enum="Error" />
-			<argument index="0" name="max_channels" type="int" />
-			<argument index="1" name="studio_flags" type="int" enum="FmodManager.InitFlags" />
+			<param index="0" name="init_flags" type="int" enum="FmodManager.InitFlags" />
+			<param index="1" name="max_channels" type="int" />
 			<description>
-				Initialize the FMOD Studio System. See [url="https://www.fmod.com/resources/documentation-api?version=2.02&amp;page=studio-api-system.html"]FMOD Docs[/url]
+				Initializes the FMOD Studio system. [param max_channels] is the maximum number of channels the FMOD Sound System should use.
 			</description>
 		</method>
 		<method name="load_bank">
 			<return type="int" enum="Error" />
-			<argument index="0" name="path_relative_to_project_root" type="String" />
-			<argument index="1" name="load_flags" type="int" enum="FmodManager.BankLoadFlags" />
+			<param index="0" name="path_relative_to_project_root" type="String" />
+			<param index="1" name="load_flags" type="int" enum="FmodManager.BankLoadFlags" />
 			<description>
-				Load a bank. The path specified is relative to your project root. For example: If my banks are in res://fmod_banks/. I would input "fmod_banks/Master.bank" to load the Master bank.
-			</description>
-		</method>
-		<method name="oneshot">
-			<return type="FmodEventInstance" />
-			<argument index="0" name="event_path" type="String" />
-			<argument index="1" name="autoplay" type="bool" />
-			<description>
-				Create a FmodEventInstance that will be freed after it stops playing. See [method create_event_instance]
+				Loads an FMOD Bank into the Studio system.
+				[b]Note:[/b] Path provided must be relative to project root.
+				Example: A bank located at [code]res://banks/Music.bank[/code] will be loaded with [code]Fmod.load("./banks/Music.bank", NORMAL_LOAD)[/code].
 			</description>
 		</method>
 		<method name="play">
 			<return type="FmodEventInstance" />
-			<argument index="0" name="event_path" type="String" />
+			<param index="0" name="event_path" type="String" />
 			<description>
-				Convinience method for ease of use, alias for [method oneshot].
+				Creates an [FmodEventInstance] and immediately plays it.
 			</description>
 		</method>
 		<method name="randomize_seed">
 			<return type="void" />
 			<description>
-				Internal function to make sure randomization is done right.
+				Randomizes FMOD's random number generator for randome events.
+				This is called automatically when FMOD is initialized.
+				See the [url=https://www.fmod.com/docs/2.01/api/core-api-system.html#fmod_advancedsettings]FMOD Documentation[/url].
 			</description>
 		</method>
-		<method name="set_events">
+		<method name="set_global_parameter">
 			<return type="void" />
-			<argument index="0" name="a" type="Array" />
+			<param index="0" name="param_name" type="String" />
+			<param index="1" name="new_value" type="float" />
 			<description>
-				Internal.
+				Sets a global parameter's value.
 			</description>
 		</method>
 	</methods>
 	<constants>
 		<constant name="NORMAL" value="0" enum="InitFlags">
+			Use defaults for all initialization options.
 		</constant>
 		<constant name="LIVE_UPDATE" value="1" enum="InitFlags">
+			Enable live update.
 		</constant>
 		<constant name="ALLOW_MISSING_PLUGINS" value="2" enum="InitFlags">
+			Load banks even if they reference plugins that have not been loaded.
 		</constant>
 		<constant name="SYNCHRONOUS_UPDATE" value="3" enum="InitFlags">
+			Disable asynchronous processing and perform all processing on the calling thread instead.
 		</constant>
 		<constant name="DEFERRED_CALLBACKS" value="4" enum="InitFlags">
+			Defer timeline callbacks until the main update.
 		</constant>
 		<constant name="LOAD_FROM_UPDATE" value="5" enum="InitFlags">
+			No additional threads are created for bank and resource loading. Loading is done when the FmodManager recieves [constant Node.NOTIFICATION_PROCESS]. See [url=https://docs.godotengine.org/en/latest/tutorials/scripting/idle_and_physics_processing.html]the Godot Docs[/url].
 		</constant>
 		<constant name="MEMORY_TRACKING" value="6" enum="InitFlags">
+			Enables detailed memory usage statistics. This can help when using a C++ Debugger.
 		</constant>
 		<constant name="NORMAL_LOAD" value="0" enum="BankLoadFlags">
+			Normal bank loading.
 		</constant>
 		<constant name="NONBLOCKING" value="1" enum="BankLoadFlags">
+			Bank loading is asynchronous instead of blocking until the load is finished.
 		</constant>
 		<constant name="DECOMPRESS_SAMPLES" value="2" enum="BankLoadFlags">
+			Force samples to be decompressed when loaded.
 		</constant>
 		<constant name="UNENCRYPTED" value="3" enum="BankLoadFlags">
 		</constant>
