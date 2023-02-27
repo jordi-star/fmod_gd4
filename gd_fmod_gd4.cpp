@@ -57,7 +57,12 @@ Error FmodManager::initialize(InitFlags studio_flags, int max_channels) {
 #ifdef DEBUG_ENABLED
     print_line("Initialized FMOD successfully.");
 #endif
+	emit_signal("initialized");
     return OK;
+}
+
+bool FmodManager::is_initialized() {
+	return initialized;
 }
 
 void FmodManager::auto_initialize(InitFlags init_flags, TypedArray<String> banks_to_load, int max_channels) {
@@ -67,19 +72,9 @@ void FmodManager::auto_initialize(InitFlags init_flags, TypedArray<String> banks
     Error result = initialize(init_flags, max_channels);
 	ERR_FAIL_COND_MSG(result != OK, vformat("An error occured while auto-initializing FMOD. Error Code: %s", result));
 
-    Array failed_banks = Array();
     for(int i = 0; i < banks_to_load.size(); i++) {
-        print_verbose(vformat("Loading bank -> %s", banks_to_load[i]));
-        Error e = load_bank(banks_to_load[i], NORMAL_LOAD);
-        if(e != OK) {
-            failed_banks.append(banks_to_load[i]);
-        }
+        Ref<FmodBankResource> f = ResourceLoader::load(banks_to_load[i]);
     }
-#ifdef DEBUG_ENABLED
-    if(failed_banks.size() > 0) {
-        print_line(vformat("Some banks failed to load: ", failed_banks));
-    }
-#endif
 }
 
 void FmodManager::add_to_tree() {
@@ -87,6 +82,7 @@ void FmodManager::add_to_tree() {
 		return;
 	}
     if (get_parent() != nullptr) {
+		added_to_tree = true;
         return;
     }
     SceneTree *scene_tree = SceneTree::get_singleton();
@@ -94,8 +90,9 @@ void FmodManager::add_to_tree() {
 		return;
 	}
     scene_tree->get_root()->call_deferred(SNAME("add_child"), this);
-	added_to_tree = true;
     set_name("FMOD Manager");
+	added_to_tree = true;
+	set_process_mode(PROCESS_MODE_ALWAYS);
 }
 
 Ref<FmodEventInstance> FmodManager::create_event_instance(String event_path) {
@@ -116,35 +113,40 @@ Ref<FmodEventInstance> FmodManager::play(String event_path) {
     return event_instance;
 }
 
-Error FmodManager::load_bank(String path_relative_to_project_root, BankLoadFlags flags) {
-	ERR_FAIL_COND_V_MSG(!initialized, ERR_UNCONFIGURED, "Unable to load bank. Fmod not initalized!");
-    if (!path_relative_to_project_root.begins_with("./")) {
-        path_relative_to_project_root = "./" + path_relative_to_project_root;
-    }
-	ERR_FAIL_COND_V_MSG(loaded_banks.has(path_relative_to_project_root), ERR_ALREADY_EXISTS, vformat("Unable to load bank. Bank at '%s' already loaded!", path_relative_to_project_root));
-    FMOD::Studio::Bank *bank = nullptr;
+// Error FmodManager::load_bank(String path, BankLoadFlags flags) {
+// 	ERR_FAIL_COND_V_MSG(!initialized, ERR_UNCONFIGURED, "Unable to load bank. Fmod not initalized!");
+//     if (path_relative_to_project_root.begins_with("res://")) {
+//         path_relative_to_project_root = "./" + path_relative_to_project_root;
+//     }
+// 	ERR_FAIL_COND_V_MSG(loaded_banks.has(path_relative_to_project_root), ERR_ALREADY_EXISTS, vformat("Unable to load bank. Bank at '%s' already loaded!", path_relative_to_project_root));
+//     FMOD::Studio::Bank *bank = nullptr;
 
-    FMOD_STUDIO_LOAD_BANK_FLAGS load_flag;
-    switch (flags) {
-		case NONBLOCKING: {
-			load_flag = FMOD_STUDIO_LOAD_BANK_NONBLOCKING;
-		} break;
-		case DECOMPRESS_SAMPLES: {
-			load_flag = FMOD_STUDIO_LOAD_BANK_DECOMPRESS_SAMPLES;
-		} break;
-		case UNENCRYPTED: {
-			load_flag = FMOD_STUDIO_LOAD_BANK_UNENCRYPTED;
-		} break;
-		default: {
-			load_flag = FMOD_STUDIO_LOAD_BANK_NORMAL;
-		} break;
-    }
+//     FMOD_STUDIO_LOAD_BANK_FLAGS load_flag;
+//     switch (flags) {
+// 		case NONBLOCKING: {
+// 			load_flag = FMOD_STUDIO_LOAD_BANK_NONBLOCKING;
+// 		} break;
+// 		case DECOMPRESS_SAMPLES: {
+// 			load_flag = FMOD_STUDIO_LOAD_BANK_DECOMPRESS_SAMPLES;
+// 		} break;
+// 		case UNENCRYPTED: {
+// 			load_flag = FMOD_STUDIO_LOAD_BANK_UNENCRYPTED;
+// 		} break;
+// 		default: {
+// 			load_flag = FMOD_STUDIO_LOAD_BANK_NORMAL;
+// 		} break;
+//     }
 
-    FMOD_RESULT result = fmod_system->loadBankFile(path_relative_to_project_root.utf8().get_data(), load_flag, &bank);
-	ERR_FAIL_COND_V_MSG(!bank, ERR_CANT_OPEN, vformat("Unable to load bank at %s. FMOD_RESULT error code: %s", path_relative_to_project_root, static_cast<int>(result)));
-    loaded_banks.insert(path_relative_to_project_root, bank);
-    return OK;
-}
+//     FMOD_RESULT result = fmod_system->loadBankFile(path_relative_to_project_root.utf8().get_data(), load_flag, &bank);
+// 	ERR_FAIL_COND_V_MSG(!bank, ERR_CANT_OPEN, vformat("Unable to load bank at %s. FMOD_RESULT error code: %s", path_relative_to_project_root, static_cast<int>(result)));
+//     loaded_banks.insert(path_relative_to_project_root, bank);
+//     return OK;
+// }
+
+// Error FmodManager::load_bank_r(FmodBankResource bank) {
+// 	ERR_FAIL_COND_V_MSG(!initialized, ERR_UNCONFIGURED, "Unable to load bank. Fmod not initalized!");
+// 	return Error();
+// }
 
 void FmodManager::randomize_seed() {
 	ERR_FAIL_COND_MSG(!initialized, "Unable to randomize FMOD seed. FMOD not initalized!");
@@ -164,9 +166,12 @@ void FmodManager::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("create_event_instance", "event_path"), &FmodManager::create_event_instance);
     ClassDB::bind_method(D_METHOD("play", "event_path"), &FmodManager::play);
     ClassDB::bind_method(D_METHOD("get_vca", "vca_path"), &FmodManager::get_vca);
-    ClassDB::bind_method(D_METHOD("load_bank", "path_relative_to_project_root", "load_flags"), &FmodManager::load_bank);
+    // ClassDB::bind_method(D_METHOD("load_bank", "path_relative_to_project_root", "load_flags"), &FmodManager::load_bank);
     ClassDB::bind_method(D_METHOD("set_global_parameter", "param_name", "new_value"), &FmodManager::set_global_parameter);
     ClassDB::bind_method(D_METHOD("get_global_parameter", "param_name"), &FmodManager::get_global_parameter);
+    ClassDB::bind_method(D_METHOD("is_initialized"), &FmodManager::is_initialized);
+
+	ADD_SIGNAL(MethodInfo("initialized"));
 
     BIND_ENUM_CONSTANT(NORMAL);
     BIND_ENUM_CONSTANT(LIVE_UPDATE);
@@ -221,10 +226,8 @@ FmodManager::FmodManager() {
 	// bool use_custom = GLOBAL_DEF("fmod/config/use_custom_fmod_manager", false);
 	int max_channels = GLOBAL_DEF("fmod/config/max_channels", 1024);
 	InitFlags init_flags = static_cast<InitFlags>(GLOBAL_DEF_BASIC(PropertyInfo(Variant::INT, "fmod/config/initialization_mode", PROPERTY_HINT_ENUM, INIT_FLAGS_PROPERTY_HINT), 0).operator unsigned int());
-	TypedArray<String> default_banks = TypedArray<String>();
-	default_banks.push_back("./Master.bank");
-	default_banks.push_back("./Master.strings.bank");
-	TypedArray<String> initial_banks = GLOBAL_DEF_BASIC("fmod/config/banks_to_load", default_banks);
+	// This is read-only because banks should be set to autoload by toggling "Autoload" on the bank in-editor.
+	TypedArray<String> initial_banks = GLOBAL_DEF(PropertyInfo(Variant::ARRAY, "fmod/config/banks_to_autoload", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_READ_ONLY), TypedArray<String>());
 	if (Engine::get_singleton()->is_editor_hint()) {
 		return;
 	}

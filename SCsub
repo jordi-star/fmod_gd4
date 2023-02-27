@@ -6,9 +6,15 @@ sources=[
     "gd_fmod_event_instance.cpp",
     "gd_fmod_vca.cpp",
     "gd_fmod_gd4.cpp",
+    "resources/fmod_bank_resource.cpp",
+    "resources/fmod_bank_resource_loader.cpp",
+    "resources/fmod_event_resource.cpp",
+    "editor/editor_fmod_event_inspector.cpp",
+    "editor/editor_fmod_manager.cpp",
+    "editor/fmod_event_path_property_editor.cpp",
     "register_types.cpp",
 ]
 
 module_env = env.Clone()
 module_env.add_source_files(module_env.modules_sources, sources)
-module_env.Append(CPPPATH=[".", "api/core/inc", "api/studio/inc", "api/core/lib/x64", "api/studio/lib/x64"])
+module_env.Append(CPPPATH=[".", "editor", "resources", "api/core/inc", "api/studio/inc", "api/core/lib/x64", "api/studio/lib/x64"])

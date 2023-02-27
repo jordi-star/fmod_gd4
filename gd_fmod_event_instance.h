@@ -55,8 +55,9 @@ public:
     const void process_current_callback();
 
     Error initialize(const String event_path);
-    static Ref<FmodEventInstance> create(const String event_path);
-    FmodEventInstance();
+	Error initialize_from(const FMOD::Studio::EventDescription *e_desc);
+	static Ref<FmodEventInstance> create(const String event_path);
+	FmodEventInstance();
     ~FmodEventInstance();
 };
 
