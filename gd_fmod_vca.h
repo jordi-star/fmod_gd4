@@ -28,6 +28,7 @@ public:
     String path;
     String get_path();
     FmodVCA();
+    ~FmodVCA();
 
 };
 

@@ -43,3 +43,7 @@ void FmodVCA::_bind_methods() {
 }
 
 FmodVCA::FmodVCA() {}
+
+FmodVCA::~FmodVCA() {
+}
+
