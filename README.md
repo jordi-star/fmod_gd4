@@ -30,18 +30,16 @@ You'll see folders named after the architecture they're designed for. (x86 for 3
 
 # Usage
 * Configure FMOD by visting `Project Settings/Fmod`
-> Bank paths are relative to "res://": For example: we'd change `res://banks/Master.bank` to just `banks/Master.bank`. Autoinitialization automatically adds `.bank`, omit it when changing "Banks to load" (`Fmod/config/banks_to_load` in `ProjectSettings`)
+> Bank paths are relative to "res://": For example: we'd change `res://banks/Master.bank` to just `banks/Master.bank`.
 * Create event instances using
 ```py
 Fmod.create_event_instance(String event_path, bool autoplay, bool oneshot); # Returns FmodEventInstance
 ```
-* Or use the alias functions for readability:
+* Or:
 ```py
-# Oneshots free themselves as soon as they completely stop.
-Fmod.oneshot(String event_path, bool autoplay); # Returns FmodEventInstance
+FmodEventInstance.create(String event_path);
 ```
 ```py
-# Alias for oneshot(event_path, true)
 Fmod.play(String event_path); # Returns FmodEventInstance
 ```
 
@@ -112,5 +110,7 @@ func fade_vca(vca:String, final_value:float, duration:float):
 - [x] Singleton and Autoinitialization
 - [x] Playing events and loading banks
 - [x] Get VCAs
+- [ ] Banks as resources
+- [ ] Editor cache of Master.strings to use for FmodEventInstance editor plugin
+- [ ] FmodEventInstance editor plugin
 
-The rest of the FMOD API will be added in my free time :+1:, this project isn't a priority.
