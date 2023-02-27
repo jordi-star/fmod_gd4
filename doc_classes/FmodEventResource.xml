@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodEventResource" inherits="Resource" version="4.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../class.xsd">
+	<brief_description>
+	</brief_description>
+	<description>
+		Allows you to create FMODEventInstances with the [code]event_path[/code] provided. Parameters will automatically be set on instantiated instances.
+		This resource also allows you to export FMOD Event Paths:
+		[gdscript]
+			@export var hurt_sound:FmodEventResource;
+
+			func hurt():
+				hurt_sound.play(); # Instantiates a new FMODEventInstance based on the FmodEventResource provided.
+		[/gdscript]
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_event_path" qualifiers="const">
+			<return type="String" />
+			<description>
+				Get event path to be instantiated.
+			</description>
+		</method>
+		<method name="instantiate">
+			<return type="FmodEventInstance" />
+			<description>
+			Create a new [FmodEventInstance] from the [code]event_path[/code] provided. In the editor, you can add initial values to parameters, allowing you to set automatically set parameters on instantiate.
+			</description>
+		</method>
+		<method name="play">
+			<return type="FmodEventInstance" />
+			<description>
+			Instantiates and plays an [FmodEventInstance] based on this event.
+			</description>
+		</method>
+		<method name="set_event_path">
+			<return type="void" />
+			<param index="0" name="value" type="String" />
+			<description>
+				Set the event path to be instantiated.
+			</description>
+		</method>
+	</methods>
+</class>

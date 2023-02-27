@@ -11,20 +11,43 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include "register_types.h"
 
 #include "gd_fmod_gd4.h"
+#include "editor/editor_fmod_manager.h"
+#include "resources/fmod_bank_resource_loader.h"
 
 #include "core/config/project_settings.h"
 
+static Ref<FmodBankResourceLoader> bank_resource_loader;
+
 void initialize_fmod_gd4_module(ModuleInitializationLevel p_level) {
-	if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE) {
-		// Register classes
-		GDREGISTER_CLASS(FmodManager);
-		GDREGISTER_CLASS(FmodEventInstance);
-		GDREGISTER_CLASS(FmodVCA);
-		// Singleton
-		Engine::get_singleton()->add_singleton(Engine::Singleton("Fmod", FmodManager::get_singleton()));
+	switch (p_level) {
+		case MODULE_INITIALIZATION_LEVEL_SERVERS: {
+#ifdef TOOLS_ENABLED
+			memnew(EditorFmodManager);
+			EditorNode::add_init_callback(&EditorFmodManager::init_callback);
+#endif
+		} break;
+		case MODULE_INITIALIZATION_LEVEL_CORE: {
+			bank_resource_loader.instantiate();
+			ResourceLoader::add_resource_format_loader(bank_resource_loader);
+		} break;
+		case MODULE_INITIALIZATION_LEVEL_SCENE: {
+			// Register classes
+			GDREGISTER_CLASS(FmodManager);
+			GDREGISTER_CLASS(FmodEventInstance);
+			GDREGISTER_CLASS(FmodVCA);
+			GDREGISTER_CLASS(FmodBankResource);
+			GDREGISTER_CLASS(FmodEventResource);
+			// Singleton
+			Engine::get_singleton()->add_singleton(Engine::Singleton("Fmod", FmodManager::get_singleton()));
+		} break;
 	}
 }
 
 void uninitialize_fmod_gd4_module(ModuleInitializationLevel p_level) {
 	memdelete(FmodManager::get_singleton());
+	if (p_level == MODULE_INITIALIZATION_LEVEL_EDITOR) {
+		memdelete(EditorFmodManager::get_singleton());
+	}
+	ResourceLoader::remove_resource_format_loader(bank_resource_loader);
+	bank_resource_loader.unref();
 }

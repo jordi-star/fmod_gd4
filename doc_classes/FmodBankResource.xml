@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodBankResource" inherits="Resource" version="4.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../class.xsd">
+	<brief_description>
+	</brief_description>
+	<description>
+		Allows you to load or unload an FMOD bank.
+		[gdscript]
+			var sfx_bank = load("res://banks/sfx.bank");
+			# SFX Bank is now loaded
+			sfx_bank.unload();
+			# SFX Bank is no longer loaded
+		[/gdscript]
+		If this resource is freed while the bank is loaded, the bank will stay loaded.
+		You can unload the bank by loading another reference to this resource and calling [method unload].
+
+		In the editor, you can set this resource to [b]autoload[/b] if auto initialization is turned on. "Master" banks are automatically autoloaded.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_autoload" qualifiers="const">
+			<return type="bool" />
+			<description>
+			Checks if this bank is set to be autoloaded when the game starts.
+			</description>
+		</method>
+		<method name="load">
+			<return type="int" enum="Error" />
+			<description>
+			Loads the bank into the FMOD System. This is automatically called when you load a bank using [method @GlobalScope.load]: [code]load("res://my_bank.bank")[/code].
+			</description>
+		</method>
+		<method name="unload">
+			<return type="void" />
+			<description>
+			Remove from the FMOD System & unload the bank's data.
+			</description>
+		</method>
+	</methods>
+</class>

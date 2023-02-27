@@ -13,6 +13,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 #include "gd_fmod_event_instance.h"
 #include "gd_fmod_vca.h"
+#include "resources/fmod_bank_resource.h"
 
 #include "api/core/inc/fmod.hpp"
 #include "api/studio/inc/fmod_studio.hpp"
@@ -51,7 +52,7 @@ public:
 
     FMOD::Studio::System *fmod_system;
 
-    HashMap<String, FMOD::Studio::Bank*> loaded_banks;
+    HashMap<String, FMOD::Studio::Bank *> loaded_banks;
     Vector<FmodEventInstance *> events = Vector<FmodEventInstance *>();
 
 	void set_global_parameter(String p_name, float p_value);
@@ -62,9 +63,9 @@ public:
 
     void _notification(int p_what);
     Error initialize(InitFlags studio_flags, int max_channels);
+	bool is_initialized();
 	void auto_initialize(InitFlags init_flags, TypedArray<String> banks_to_load, int max_channels);
     void add_to_tree();
-    Error load_bank(String path_relative_to_project_root, BankLoadFlags flags);
 
 	Ref<FmodEventInstance> create_event_instance(String event_path);
     Ref<FmodVCA> get_vca(String vca_path);
