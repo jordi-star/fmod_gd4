@@ -36,11 +36,25 @@ void EditorFmodManager::generate_cache() {
 }
 
 void EditorFmodManager::init_callback() {
-	EditorFileSystem::get_singleton()->connect(SNAME("filesystem_changed"), callable_mp(singleton, &EditorFmodManager::scan_for_banks));
-	singleton->scan_for_banks();
+	const int MENU_BAR_INDEX = 0;
+	MenuButton *fmod_menu = memnew(MenuButton);
+	EditorNode::get_singleton()->get_menu_hb()->get_child(MENU_BAR_INDEX)->add_sibling(fmod_menu);
+	fmod_menu->set_text("FMOD");
+	fmod_menu->get_popup()->connect(SNAME("id_pressed"), callable_mp(singleton, &EditorFmodManager::fmod_menu_clicked));
+	fmod_menu->get_popup()->add_item("Scan For Banks", FmodMenuOption::SCAN_FOR_BANKS);
 
+	singleton->fmod_menu = fmod_menu;
 	singleton->inspector_plugin = memnew(EditorFmodEventInspector);
 	EditorInspector::add_inspector_plugin(singleton->inspector_plugin);
+}
+
+void EditorFmodManager::fmod_menu_clicked(int id) {
+	FmodMenuOption menu_option = static_cast<FmodMenuOption>(id);
+	switch (menu_option) {
+		case FmodMenuOption::SCAN_FOR_BANKS: {
+			scan_for_banks();
+		}
+	}
 }
 
 void EditorFmodManager::_scan_files(EditorFileSystemDirectory *dir) {
@@ -48,6 +62,9 @@ void EditorFmodManager::_scan_files(EditorFileSystemDirectory *dir) {
 	for (int i = 0; i < count; i++) {
 		String file_name = dir->get_file(i);
 		if (file_name.get_extension() == "bank") {
+			if (scan_for_banks_progress) {
+				scan_for_banks_progress->step(vformat("Loading bank at %s", file_name), 2);
+			}
 			load_bank(dir->get_file_path(i));
 		}
 	}
@@ -58,6 +75,9 @@ void EditorFmodManager::_scan_dir(EditorFileSystemDirectory *dir) {
 		return;
 	}
 	// Scan current directory
+	if (scan_for_banks_progress) {
+		scan_for_banks_progress->step("Scanning for FMOD Banks", 1);
+	}
 	_scan_files(dir);
 	int count = dir->get_subdir_count();
 	// Scan subdirs
@@ -67,8 +87,17 @@ void EditorFmodManager::_scan_dir(EditorFileSystemDirectory *dir) {
 }
 
 void EditorFmodManager::scan_for_banks() {
-	_scan_dir(EditorFileSystem::get_singleton()->get_filesystem());
+	if (scan_for_banks_progress) {
+		memdelete(scan_for_banks_progress);
+	}
+	EditorFileSystemDirectory *main_dir = EditorFileSystem::get_singleton()->get_filesystem();
+	const int STEP_COUNT = 3;
+	scan_for_banks_progress = memnew(EditorProgress("scan_for_fmod_banks", "Scanning for FMOD Banks", STEP_COUNT));
+	_scan_dir(main_dir);
+	scan_for_banks_progress->step("Generating strings cache", 3);
 	generate_cache();
+	memdelete(scan_for_banks_progress);
+	scan_for_banks_progress = nullptr;
 }
 
 Error EditorFmodManager::load_bank(const String &bank_path) {
@@ -122,6 +151,7 @@ EditorFmodManager::EditorFmodManager() {
 		return;
 	}
 	singleton = this;
+	// Initialize FMOD System
 	FMOD::Studio::System::create(&fmod_system);
 	fmod_system->initialize(1, FMOD_STUDIO_INIT_LIVEUPDATE, FMOD_INIT_NORMAL, nullptr);
 }

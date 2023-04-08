@@ -12,6 +12,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #define GODOT_EDITOR_FMOD_H
 
 #include "editor/editor_node.h"
+#include "scene/gui/menu_button.h"
 #include "editor/editor_inspector.h"
 #include "core/object/class_db.h"
 #include "core/object/object.h"
@@ -28,6 +29,12 @@ protected:
 	EditorFmodEventInspector *inspector_plugin;
 	static void _bind_methods();
 	Vector<String> get_event_paths(FMOD::Studio::Bank *bank);
+	enum FmodMenuOption {
+		SCAN_FOR_BANKS,
+	};
+	MenuButton *fmod_menu = nullptr;
+	void fmod_menu_clicked(int id);
+	EditorProgress *scan_for_banks_progress = nullptr;
 
 public:
     static EditorFmodManager *get_singleton();
