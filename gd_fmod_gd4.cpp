@@ -113,41 +113,6 @@ Ref<FmodEventInstance> FmodManager::play(String event_path) {
     return event_instance;
 }
 
-// Error FmodManager::load_bank(String path, BankLoadFlags flags) {
-// 	ERR_FAIL_COND_V_MSG(!initialized, ERR_UNCONFIGURED, "Unable to load bank. Fmod not initalized!");
-//     if (path_relative_to_project_root.begins_with("res://")) {
-//         path_relative_to_project_root = "./" + path_relative_to_project_root;
-//     }
-// 	ERR_FAIL_COND_V_MSG(loaded_banks.has(path_relative_to_project_root), ERR_ALREADY_EXISTS, vformat("Unable to load bank. Bank at '%s' already loaded!", path_relative_to_project_root));
-//     FMOD::Studio::Bank *bank = nullptr;
-
-//     FMOD_STUDIO_LOAD_BANK_FLAGS load_flag;
-//     switch (flags) {
-// 		case NONBLOCKING: {
-// 			load_flag = FMOD_STUDIO_LOAD_BANK_NONBLOCKING;
-// 		} break;
-// 		case DECOMPRESS_SAMPLES: {
-// 			load_flag = FMOD_STUDIO_LOAD_BANK_DECOMPRESS_SAMPLES;
-// 		} break;
-// 		case UNENCRYPTED: {
-// 			load_flag = FMOD_STUDIO_LOAD_BANK_UNENCRYPTED;
-// 		} break;
-// 		default: {
-// 			load_flag = FMOD_STUDIO_LOAD_BANK_NORMAL;
-// 		} break;
-//     }
-
-//     FMOD_RESULT result = fmod_system->loadBankFile(path_relative_to_project_root.utf8().get_data(), load_flag, &bank);
-// 	ERR_FAIL_COND_V_MSG(!bank, ERR_CANT_OPEN, vformat("Unable to load bank at %s. FMOD_RESULT error code: %s", path_relative_to_project_root, static_cast<int>(result)));
-//     loaded_banks.insert(path_relative_to_project_root, bank);
-//     return OK;
-// }
-
-// Error FmodManager::load_bank_r(FmodBankResource bank) {
-// 	ERR_FAIL_COND_V_MSG(!initialized, ERR_UNCONFIGURED, "Unable to load bank. Fmod not initalized!");
-// 	return Error();
-// }
-
 void FmodManager::randomize_seed() {
 	ERR_FAIL_COND_MSG(!initialized, "Unable to randomize FMOD seed. FMOD not initalized!");
     FMOD_ADVANCEDSETTINGS *advancedSettings = new FMOD_ADVANCEDSETTINGS();
@@ -217,6 +182,7 @@ void FmodManager::_notification(int p_what) {
                 i++;
             }
         } break;
+		default: break;
     }
 }
 

@@ -43,6 +43,7 @@ void initialize_fmod_gd4_module(ModuleInitializationLevel p_level) {
 			// Singleton
 			Engine::get_singleton()->add_singleton(Engine::Singleton("Fmod", FmodManager::get_singleton()));
 		} break;
+		default: break;
 	}
 }
 
@@ -63,5 +64,6 @@ void uninitialize_fmod_gd4_module(ModuleInitializationLevel p_level) {
 		case MODULE_INITIALIZATION_LEVEL_SCENE: {
 			memdelete(FmodManager::get_singleton());
 		} break;
+		default: break;
 	}
 }
