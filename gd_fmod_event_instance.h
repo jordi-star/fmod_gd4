@@ -24,7 +24,7 @@ protected:
     FMOD::Studio::EventInstance *inner_event_instance = nullptr;
 
 public:
-    const bool is_instance_valid();
+    bool is_instance_valid();
 
     String event_path;
 
@@ -48,11 +48,11 @@ public:
 	float get_parameter(const String p_name);
 
     // Callbacks
-    FMOD_STUDIO_EVENT_CALLBACK_TYPE current_callback = -1;
+    FMOD_STUDIO_EVENT_CALLBACK_TYPE current_callback = 0;
     int current_beat = 0;
 	void activate_fmod_callback_reciever();
 	static FMOD_RESULT F_CALLBACK fmod_callback(FMOD_STUDIO_EVENT_CALLBACK_TYPE type, FMOD_STUDIO_EVENTINSTANCE *event, void *parameters);
-    const void process_current_callback();
+    void process_current_callback();
 
     Error initialize(const String event_path);
 	Error initialize_from(const FMOD::Studio::EventDescription *e_desc);

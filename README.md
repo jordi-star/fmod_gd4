@@ -1,7 +1,7 @@
 # FMOD GD4
 Godot 4 integration of FMOD. Not feature-complete yet.
 
-Currently targeting Godot's master branch (4.1) and FMOD 2.02.
+Currently targeting Godot's master branch (4.1-28cca66d2c) and FMOD 2.02.
 
 # Installation
 1. Clone `godot`:

@@ -43,7 +43,7 @@ String FmodEventInstance::get_event_path() {
 void FmodEventInstance::set_event_path(const String path) {
 }
 
-const bool FmodEventInstance::is_instance_valid() {
+bool FmodEventInstance::is_instance_valid() {
 	return inner_event_instance != nullptr && inner_event_instance->isValid();
 }
 
@@ -137,8 +137,8 @@ FMOD_RESULT F_CALLBACK FmodEventInstance::fmod_callback(FMOD_STUDIO_EVENT_CALLBA
 	return FMOD_OK;
 }
 
-const void FmodEventInstance::process_current_callback() {
-	if (current_callback == -1) {
+void FmodEventInstance::process_current_callback() {
+	if (current_callback == 0) {
 		return;
 	}
 	switch(current_callback) {
@@ -153,7 +153,7 @@ const void FmodEventInstance::process_current_callback() {
 			emit_signal(SNAME("event_beat"), current_beat);
 		} break;
 	}
-	current_callback = -1;
+	current_callback = 0;
 }
 
 // Lifetime
