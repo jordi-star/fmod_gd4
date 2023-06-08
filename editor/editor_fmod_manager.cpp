@@ -38,7 +38,7 @@ void EditorFmodManager::generate_cache() {
 void EditorFmodManager::init_callback() {
 	const int MENU_BAR_INDEX = 0;
 	MenuButton *fmod_menu = memnew(MenuButton);
-	EditorNode::get_singleton()->get_title_bar()->get_child(MENU_BAR_INDEX)->add_sibling(fmod_menu);
+	EditorNode::get_singleton()->get_menu_hb()->get_child(MENU_BAR_INDEX)->add_sibling(fmod_menu);
 	fmod_menu->set_text("FMOD");
 	fmod_menu->get_popup()->connect(SNAME("id_pressed"), callable_mp(singleton, &EditorFmodManager::fmod_menu_clicked));
 	fmod_menu->get_popup()->add_item("Scan For Banks", FmodMenuOption::SCAN_FOR_BANKS);

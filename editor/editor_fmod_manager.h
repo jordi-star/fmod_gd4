@@ -12,7 +12,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #define GODOT_EDITOR_FMOD_H
 
 #include "editor/editor_file_system.h"
-#include "editor/gui/editor_title_bar.h"
 #include "editor/editor_node.h"
 #include "scene/gui/menu_button.h"
 #include "editor/editor_inspector.h"

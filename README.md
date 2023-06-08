@@ -1,16 +1,17 @@
-# FMOD GD4
-Godot 4 integration of FMOD. Not feature-complete yet.
+# FMOD GD4 - Stable Branch
+Godot 4.0 integration of FMOD. Not feature-complete yet.
 
-Currently targeting Godot's master branch (4.1-28cca66d2c) and FMOD 2.02.
+This branch targets the latest stable Godot release (4.0.3-stable) and FMOD 2.02.
 
 # Installation
-1. Clone `godot`:
+1. Clone `godot` and switch to 4.0.3:
 > `git clone https://github.com/godotengine/godot`
-2. Clone this repository into Godot's `modules/` folder.
-> `cd godot/modules && git clone https://github.com/summertimejordi/fmod_gd4`
+> `cd godot && git checkout tags/4.0.3-stable`
+2. Clone `fmod_gd4` into Godot's `modules/` folder.
+> `cd modules && git clone https://github.com/summertimejordi/fmod_gd4`
 3. Download [FMOD Engine 2.02+](https://www.fmod.com/download#FMOD%20Engine-select)
 4. Copy FMOD API folders to the `api` folder in the `fmod_gd4` module.
-5. [Compile Godot](https://docs.godotengine.org/en/latest/development/compiling/introduction_to_the_buildsystem.html?highlight=compile)
+5. [Compile Godot](https://docs.godotengine.org/en/stable/development/compiling/introduction_to_the_buildsystem.html?highlight=compile)
 
 **Not done yet!**
 Your newly built version of Godot will need to have the following libraries included in the same folder as it.
