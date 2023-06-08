@@ -1,8 +1,8 @@
 # FMOD GD4 - Stable Branch
 Godot 4.0 integration of FMOD. Not feature-complete yet.
 
-This branch targets the latest stable Godot release (4.0.3-stable) and FMOD 2.02.
-
+This branch targets the latest stable Godot release (4.0.x) and FMOD 2.02.
+This branch does not compile on 4.1. Check the `dev` branch for more expiramental releases.
 # Installation
 1. Clone `godot` and switch to 4.0.3:
 > `git clone https://github.com/godotengine/godot`
