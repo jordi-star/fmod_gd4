@@ -11,7 +11,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #ifndef GODOT_FMOD_EVENT_RES_H
 #define GODOT_FMOD_EVENT_RES_H
 #include "core/io/resource.h"
+#ifdef TOOLS_ENABLED
 #include "../editor/editor_fmod_manager.h"
+#endif
 #include "../gd_fmod_event_instance.h"
 #include "../gd_fmod_gd4.h"
 

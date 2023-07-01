@@ -16,12 +16,12 @@ void FmodEventResource::set_event_description() {
 		return;
 	}
 	FMOD::Studio::System *system = nullptr;
-	if (Engine::get_singleton()->is_editor_hint()) {
-		system = EditorFmodManager::get_singleton()->fmod_system;
-	} else {
-		ERR_FAIL_COND_MSG(!FmodManager::get_singleton()->initialized, vformat("Unable to get event description from FmodEventResource %s. FMOD not initialized!", event_path));
-		system = FmodManager::get_singleton()->fmod_system;
-	}
+#ifdef TOOLS_ENABLED
+	system = EditorFmodManager::get_singleton()->fmod_system;
+#else
+	ERR_FAIL_COND_MSG(!FmodManager::get_singleton()->initialized, vformat("Unable to get event description from FmodEventResource %s. FMOD not initialized!", event_path));
+	system = FmodManager::get_singleton()->fmod_system;
+#endif
 	FMOD_RESULT result = system->getEvent(event_path.utf8().ptr(), &event_description);
 	parameters.clear();
 	notify_property_list_changed();

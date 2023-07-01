@@ -11,8 +11,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 #include "register_types.h"
 
 #include "gd_fmod_gd4.h"
+#ifdef TOOLS_ENABLED
 #include "editor/editor_fmod_manager.h"
+#endif
 #include "resources/fmod_bank_resource_loader.h"
+#include "resources/fmod_event_resource.h"
 
 #include "core/config/project_settings.h"
 

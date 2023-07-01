@@ -1,5 +1,5 @@
 #include "fmod_bank_resource_loader.h"
-#include "../editor/editor_fmod_manager.h"
+// #include "../editor/editor_fmod_manager.h"
 
 void FmodBankResourceLoader::_bind_methods() {
 }

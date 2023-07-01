@@ -9,11 +9,15 @@ sources=[
     "resources/fmod_bank_resource.cpp",
     "resources/fmod_bank_resource_loader.cpp",
     "resources/fmod_event_resource.cpp",
+    "register_types.cpp",
+]
+
+if env["target"] == "editor":
+	sources.append([
     "editor/editor_fmod_event_inspector.cpp",
     "editor/editor_fmod_manager.cpp",
     "editor/fmod_event_path_property_editor.cpp",
-    "register_types.cpp",
-]
+	])
 
 module_env = env.Clone()
 module_env.add_source_files(module_env.modules_sources, sources)
