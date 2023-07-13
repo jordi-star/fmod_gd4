@@ -103,7 +103,6 @@ FmodEventInstance::PlaybackState FmodEventInstance::get_playback_state() {
 // Parameters
 void FmodEventInstance::set_parameter(const String p_name, const float p_value) {
 	ERR_FAIL_COND_MSG(!is_instance_valid(), vformat("Event instance invalid. Could not set paramter %s", p_name));
-	print_line(vformat("%s, %s", p_name, p_value));
 	FMOD_RESULT result = inner_event_instance->setParameterByName(p_name.utf8(), p_value);
 	ERR_FAIL_COND_MSG(result != FMOD_RESULT::FMOD_OK, vformat("An error occured while setting parameter %s on %s. FMOD_RESULT Error Code: %s", p_name, event_path, static_cast<int>(result)));
 }
@@ -118,8 +117,8 @@ float FmodEventInstance::get_parameter(const String p_name) {
 
 // Callbacks
 void FmodEventInstance::activate_fmod_callback_reciever() {
-	inner_event_instance->setUserData(&current_callback);
-	inner_event_instance->setCallback(FmodEventInstance::fmod_callback, FMOD_STUDIO_EVENT_CALLBACK_ALL);
+	inner_event_instance->setUserData(this);
+	inner_event_instance->setCallback(FmodEventInstance::fmod_callback, FMOD_STUDIO_EVENT_CALLBACK_STARTED | FMOD_STUDIO_EVENT_CALLBACK_STOPPED | FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_BEAT);
 }
 
 FMOD_RESULT F_CALLBACK FmodEventInstance::fmod_callback(FMOD_STUDIO_EVENT_CALLBACK_TYPE type, FMOD_STUDIO_EVENTINSTANCE *event, void *parameters) {
@@ -127,17 +126,34 @@ FMOD_RESULT F_CALLBACK FmodEventInstance::fmod_callback(FMOD_STUDIO_EVENT_CALLBA
 	if (event_instance == nullptr) {
 		return FMOD_ERR_INVALID_HANDLE;
 	}
-	void *event_user_data = nullptr;
-	event_instance->getUserData(&event_user_data);
-	int *current_callback_ptr = static_cast<int *>(event_user_data);
-	if (current_callback_ptr == nullptr) {
+	void *pointer;
+	event_instance->getUserData(&pointer);
+	FmodEventInstance *instance = static_cast<FmodEventInstance *>(pointer);
+	if (instance == nullptr) {
 		return FMOD_ERR_INVALID_HANDLE;
 	}
-	*current_callback_ptr = type;
+	switch(type) {
+		case FMOD_STUDIO_EVENT_CALLBACK_STARTED: {
+			instance->call_deferred("emit_signal", SNAME("event_started"));
+		} break;
+		case FMOD_STUDIO_EVENT_CALLBACK_SOUND_STOPPED: {
+			instance->call_deferred("emit_signal", SNAME("event_stopped"));
+		} break;
+		case FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_BEAT: {
+			instance->current_beat += 1;
+			instance->call_deferred("emit_signal", SNAME("event_beat"), instance->current_beat);
+		} break;
+	}
 	return FMOD_OK;
 }
 
 void FmodEventInstance::process_current_callback() {
+	return;
+	void *pointer;
+	inner_event_instance->getUserData(&pointer);
+	if (pointer == nullptr) {
+		return;
+	}
 	if (current_callback == 0) {
 		return;
 	}
@@ -153,7 +169,7 @@ void FmodEventInstance::process_current_callback() {
 			emit_signal(SNAME("event_beat"), current_beat);
 		} break;
 	}
-	current_callback = 0;
+	inner_event_instance->setUserData(nullptr);
 }
 
 // Lifetime
@@ -162,6 +178,7 @@ FmodEventInstance::FmodEventInstance() {
 
 FmodEventInstance::~FmodEventInstance() {
 	if(inner_event_instance != nullptr) {
+		inner_event_instance->setCallback(nullptr);
 		inner_event_instance->release();
 	}
 }
@@ -192,17 +209,18 @@ Error FmodEventInstance::initialize(const String instance_event_path) {
 
 Error FmodEventInstance::initialize_from(const FMOD::Studio::EventDescription *e_desc) {
 	ERR_FAIL_COND_V_MSG(!FmodManager::get_singleton()->initialized, Error::ERR_UNCONFIGURED, "Could not initialize event instance. Fmod is not initalized!");
+	ERR_FAIL_COND_V_MSG(e_desc == nullptr, Error::ERR_INVALID_DATA, "Could not initialize event instance from null event description!");
 	ERR_FAIL_COND_V_MSG(is_instance_valid(), Error::ERR_ALREADY_IN_USE, "Attempted to re-initialize a valid event instance!");
 
-    FMOD::Studio::EventInstance *e_instance = nullptr;
-    FMOD_RESULT result = e_desc->createInstance(&e_instance);
-	ERR_FAIL_NULL_V_MSG(e_instance, Error::ERR_CANT_CREATE, vformat("Could not create Event Instance from existing event description. FMOD_RESULT: %s", result));
-
-	this->inner_event_instance = e_instance;
 	int size;
 	e_desc->getPath(nullptr, 0, &size);
 	char *path = (char *)memalloc(size);
 	e_desc->getPath(path, size, nullptr);
+    FMOD::Studio::EventInstance *e_instance = nullptr;
+    FMOD_RESULT result = e_desc->createInstance(&e_instance);
+	ERR_FAIL_NULL_V_MSG(e_instance, Error::ERR_CANT_CREATE, vformat("Could not create Event Instance from existing event description %s. FMOD_RESULT: %s", path, result));
+
+	this->inner_event_instance = e_instance;
 	this->event_path = String(path);
 	activate_fmod_callback_reciever();
 	FmodManager::get_singleton()->events.append(this);
