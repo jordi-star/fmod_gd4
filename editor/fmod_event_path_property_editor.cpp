@@ -60,7 +60,9 @@ void FmodEventPickerDialog::dialog_confirmed() {
 }
 
 void FmodEventPickerDialog::populate_events(String search_text) {
-	EditorFmodManager::get_singleton()->scan_for_banks();
+	if (EditorFmodManager::get_singleton()->cache.dirty) {
+		EditorFmodManager::get_singleton()->scan_for_banks();
+	}
 	events->clear();
 	search_text = search_text.to_lower().replace(" ", "");
 	PackedStringArray *event_paths = &EditorFmodManager::get_singleton()->cache.event_paths;
