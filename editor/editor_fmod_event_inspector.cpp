@@ -1,7 +1,6 @@
 #include "editor_fmod_event_inspector.h"
 
 bool EditorFmodEventInspector::can_handle(Object *p_object) {
-	print_line(vformat("E!%s", Object::cast_to<FmodEventResource>(p_object) != nullptr));
 	return Object::cast_to<FmodEventResource>(p_object) != nullptr;
 }
 
