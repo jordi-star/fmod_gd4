@@ -61,11 +61,19 @@ Error FmodManager::initialize(InitFlags studio_flags, int max_channels) {
     return OK;
 }
 
+void FmodManager::enable_debugging(DebugFlags debug_flags) {
+	if (FMOD_Debug_Initialize(debug_flags, FMOD_DEBUG_MODE_CALLBACK, FmodManager::debug_callback, nullptr) == FMOD_ERR_UNSUPPORTED) {
+		print_error("Unable to enable debugging. Must be using the logging release of FMOD.");
+	} else {
+		print_line("Debugging enabled.");
+	}
+}
+
 bool FmodManager::is_initialized() {
 	return initialized;
 }
 
-void FmodManager::auto_initialize(InitFlags init_flags, TypedArray<String> banks_to_load, int max_channels) {
+void FmodManager::auto_initialize(InitFlags init_flags, TypedArray<String> banks_to_load, int max_channels, DebugFlags debug_flags) {
 #ifdef DEBUG_ENABLED
     print_line("Auto-initializing FMOD. Visit \"Project Settings/Fmod\" to configure.");
 #endif
@@ -75,6 +83,10 @@ void FmodManager::auto_initialize(InitFlags init_flags, TypedArray<String> banks
     for(int i = 0; i < banks_to_load.size(); i++) {
         Ref<FmodBankResource> f = ResourceLoader::load(banks_to_load[i]);
     }
+	if (debug_flags == DebugFlags::NONE) {
+		return;
+	}
+	enable_debugging(debug_flags);
 }
 
 void FmodManager::add_to_tree() {
@@ -135,6 +147,7 @@ void FmodManager::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_global_parameter", "param_name", "new_value"), &FmodManager::set_global_parameter);
     ClassDB::bind_method(D_METHOD("get_global_parameter", "param_name"), &FmodManager::get_global_parameter);
     ClassDB::bind_method(D_METHOD("is_initialized"), &FmodManager::is_initialized);
+	ClassDB::bind_method(D_METHOD("enable_debugging", "debug_flags"), &FmodManager::enable_debugging);
 
 	ADD_SIGNAL(MethodInfo("initialized"));
 
@@ -149,6 +162,14 @@ void FmodManager::_bind_methods() {
     BIND_ENUM_CONSTANT(NONBLOCKING);
     BIND_ENUM_CONSTANT(DECOMPRESS_SAMPLES);
     BIND_ENUM_CONSTANT(UNENCRYPTED);
+
+	BIND_ENUM_CONSTANT(NONE);
+	BIND_ENUM_CONSTANT(ERROR);
+	BIND_ENUM_CONSTANT(WARNING);
+	BIND_ENUM_CONSTANT(DEFAULT_LOG);
+	BIND_ENUM_CONSTANT(TYPE_MEMORY);
+	BIND_ENUM_CONSTANT(TYPE_FILE);
+	BIND_ENUM_CONSTANT(TYPE_TRACE);
 }
 
 void FmodManager::set_global_parameter(String p_name, float p_value) {
@@ -171,19 +192,24 @@ void FmodManager::_notification(int p_what) {
                 return;
             }
             fmod_system->update();
-            for (int i = 0; i < events.size();) {
-                Ref<FmodEventInstance> event = events.get(i);
-                // Check if event instance has been freed and inner event instance is valid.
-                if (!event.is_valid() || !event->is_instance_valid()) {
-                    events.remove_at(i);
-                    continue;
-                }
-                event->process_current_callback();
-                i++;
-            }
+            // for (int i = 0; i < events.size();) {
+            //     FmodEventInstance *event = events.get(i);
+            //     // Check if event instance has been freed and inner event instance is valid.
+            //     if (event == nullptr || !event->is_instance_valid()) {
+            //         events.remove_at(i);
+            //         continue;
+            //     }
+            //     event->process_current_callback();
+            //     i++;
+            // }
         } break;
 		default: break;
     }
+}
+
+FMOD_RESULT F_CALLBACK FmodManager::debug_callback(FMOD_DEBUG_FLAGS flags, const char *file, int line, const char *func, const char *message) {
+	print_line(vformat("FMOD [%s \"%s\"]:%s", line, func, message));
+	return FMOD_OK;
 }
 
 FmodManager::FmodManager() {
@@ -194,11 +220,12 @@ FmodManager::FmodManager() {
 	InitFlags init_flags = static_cast<InitFlags>(GLOBAL_DEF_BASIC(PropertyInfo(Variant::INT, "fmod/config/initialization_mode", PROPERTY_HINT_ENUM, INIT_FLAGS_PROPERTY_HINT), 0).operator unsigned int());
 	// This is read-only because banks should be set to autoload by toggling "Autoload" on the bank in-editor.
 	TypedArray<String> initial_banks = GLOBAL_DEF(PropertyInfo(Variant::ARRAY, "fmod/config/banks_to_autoload", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_READ_ONLY), TypedArray<String>());
+	DebugFlags debug_flags = static_cast<DebugFlags>(GLOBAL_DEF(PropertyInfo(Variant::INT, "fmod/config/debug_mode", PROPERTY_HINT_ENUM, DEBUG_FLAGS_PROPERTY_HINT), DebugFlags::DEFAULT_LOG).operator unsigned int());
 	if (Engine::get_singleton()->is_editor_hint()) {
 		return;
 	}
 	if (auto_initialize) {
-		singleton->auto_initialize(init_flags, initial_banks, max_channels);
+		singleton->auto_initialize(init_flags, initial_banks, max_channels, debug_flags);
 	}
 }
 

@@ -48,6 +48,17 @@ public:
         UNENCRYPTED
     };
 
+	enum DebugFlags {
+		NONE = 0x00000000,
+		ERROR = 0x00000001,
+		WARNING = 0x00000002,
+		DEFAULT_LOG = 0x00000004,
+		TYPE_MEMORY = 0x0000000100,
+		TYPE_FILE = 0x00000200,
+		TYPE_TRACE = 0x0000800,
+	};
+	const String DEBUG_FLAGS_PROPERTY_HINT = "NONE,ERROR,WARNING,DEFAULT_LOG";
+
     static FmodManager* get_singleton();
 
     FMOD::Studio::System *fmod_system;
@@ -62,9 +73,11 @@ public:
 	bool added_to_tree = false;
 
     void _notification(int p_what);
-    Error initialize(InitFlags studio_flags, int max_channels);
+	static FMOD_RESULT F_CALLBACK debug_callback(FMOD_DEBUG_FLAGS flags, const char *file, int line, const char *func, const char *message);
+	Error initialize(InitFlags studio_flags, int max_channels);
+	void enable_debugging(DebugFlags debug_flags);
 	bool is_initialized();
-	void auto_initialize(InitFlags init_flags, TypedArray<String> banks_to_load, int max_channels);
+	void auto_initialize(InitFlags init_flags, TypedArray<String> banks_to_load, int max_channels, DebugFlags debug_flags);
     void add_to_tree();
 
 	Ref<FmodEventInstance> create_event_instance(String event_path);
@@ -79,5 +92,6 @@ public:
 
 VARIANT_ENUM_CAST(FmodManager::InitFlags);
 VARIANT_ENUM_CAST(FmodManager::BankLoadFlags);
+VARIANT_ENUM_CAST(FmodManager::DebugFlags);
 
 #endif
