@@ -17,29 +17,28 @@ void FmodEventResource::set_event_description() {
 	}
 	FMOD::Studio::System *system = nullptr;
 #ifdef TOOLS_ENABLED
-	system = EditorFmodManager::get_singleton()->fmod_system;
+	if (Engine::get_singleton()->is_editor_hint()) {
+		system = EditorFmodManager::get_singleton()->fmod_system;
+	} else {
+		system = FmodManager::get_singleton()->fmod_system;
+	}
 #else
 	ERR_FAIL_COND_MSG(!FmodManager::get_singleton()->initialized, vformat("Unable to get event description from FmodEventResource %s. FMOD not initialized!", event_path));
 	system = FmodManager::get_singleton()->fmod_system;
 #endif
 	FMOD_RESULT result = system->getEvent(event_path.utf8().ptr(), &event_description);
+	ERR_FAIL_COND_MSG(result != FMOD_OK, vformat("An error occured while loading event description for %s: FMOD_RESULT %s", event_path, result));
 	parameters.clear();
 	notify_property_list_changed();
-	if (result != FMOD_OK) {
-		return;
-	}
     int parameter_count = 0;
 	event_description->getParameterDescriptionCount(&parameter_count);
 	for (int i = 0; i < parameter_count; i++) {
 		FMOD_STUDIO_PARAMETER_DESCRIPTION parameter;
 		event_description->getParameterDescriptionByIndex(i, &parameter);
-		String prefix;
 		if (parameter.flags & FMOD_STUDIO_PARAMETER_GLOBAL) {
-			prefix = "global_parameters/";
-		} else {
-			prefix = "initial_parameter_values/";
+			continue;
 		}
-		parameters.insert(prefix + String(parameter.name), ParameterInitializer(parameter));
+		parameters.insert("initial_parameter_values/" + String(parameter.name), ParameterInitializer(parameter));
 	}
 }
 
@@ -100,10 +99,6 @@ bool FmodEventResource::_get(const StringName &p_name, Variant &r_ret) const {
 
 void FmodEventResource::set_params_on_instance(Ref<FmodEventInstance> instance) {
 	for (const KeyValue<String, ParameterInitializer> &PARAM : parameters) {
-		if (PARAM.value.is_global) {
-			FmodManager::get_singleton()->set_global_parameter(PARAM.value.parameter_description.name, PARAM.value.initial_value);
-			continue;
-		}
 		instance->set_parameter(PARAM.value.parameter_description.name, PARAM.value.initial_value);
 	}
 }
@@ -174,7 +169,4 @@ bool FmodEventResource::_property_get_revert(const StringName &p_name, Variant &
 FmodEventResource::FmodEventResource() {
 	event_path = "";
 	event_description = nullptr;
-}
-
-FmodEventResource::~FmodEventResource() {
 }

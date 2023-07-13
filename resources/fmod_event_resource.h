@@ -33,7 +33,6 @@ protected:
 		};
 		Kind kind = Kind::CONTINUOUS;
 
-		bool is_global = false;
 		bool is_labled() const { return kind == Kind::LABELED; }
 		bool is_discrete() const { return kind == Kind::DISCRETE; }
 		bool is_continuous() const { return kind == Kind::CONTINUOUS; }
@@ -41,9 +40,6 @@ protected:
 		ParameterInitializer(FMOD_STUDIO_PARAMETER_DESCRIPTION description) {
 			parameter_description = description;
 			initial_value = 0.0;
-			if (description.flags & FMOD_STUDIO_PARAMETER_GLOBAL) {
-				is_global = true;
-			}
 			if (description.flags & FMOD_STUDIO_PARAMETER_LABELED) {
 				kind = Kind::LABELED;
 				return;
@@ -63,9 +59,6 @@ protected:
 	bool _get(const StringName &p_name, Variant &r_ret) const;
 	void set_params_on_instance(Ref<FmodEventInstance> instance);
 
-	// TODO: Add more properties
-	// For example, fetch event parameters and list them to be altered by this resource on instantiate.
-
 public:
 	FMOD::Studio::EventDescription *get_event_description() const;
 	void set_event_path(String value);
@@ -79,7 +72,6 @@ public:
 	bool _property_can_revert(const StringName &p_name) const;
 	bool _property_get_revert(const StringName &p_name, Variant &r_property) const;
 	FmodEventResource();
-	~FmodEventResource();
 };
 
 #endif // GODOT_FMOD_EVENT_RES_H
