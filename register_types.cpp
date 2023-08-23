@@ -57,7 +57,9 @@ void uninitialize_fmod_gd4_module(ModuleInitializationLevel p_level) {
 			if (!Engine::get_singleton()->is_editor_hint()) {
 				return;
 			}
-			memdelete(EditorFmodManager::get_singleton());
+			if (EditorFmodManager::get_singleton() != nullptr) {
+				memdelete(EditorFmodManager::get_singleton());
+			}
 #endif
 		} break;
 		case MODULE_INITIALIZATION_LEVEL_CORE: {
@@ -65,7 +67,9 @@ void uninitialize_fmod_gd4_module(ModuleInitializationLevel p_level) {
 			bank_resource_loader.unref();
 		} break;
 		case MODULE_INITIALIZATION_LEVEL_SCENE: {
-			memdelete(FmodManager::get_singleton());
+			if (FmodManager::get_singleton() != nullptr) {
+				memdelete(FmodManager::get_singleton());
+			}
 		} break;
 		default: break;
 	}

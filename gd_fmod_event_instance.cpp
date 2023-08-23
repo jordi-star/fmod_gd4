@@ -14,6 +14,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 void FmodEventInstance::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("play"), &FmodEventInstance::play);
 	ClassDB::bind_method(D_METHOD("pause"), &FmodEventInstance::pause);
+	ClassDB::bind_method(D_METHOD("is_paused"), &FmodEventInstance::is_paused);
     ClassDB::bind_method(D_METHOD("stop", "stop_immediately"), &FmodEventInstance::stop);
     ClassDB::bind_method(D_METHOD("get_playback_state"), &FmodEventInstance::get_playback_state);
 	ClassDB::bind_method(D_METHOD("get_event_path"), &FmodEventInstance::get_event_path);
@@ -64,10 +65,16 @@ void FmodEventInstance::pause() {
 	if(!is_instance_valid()) {
 		return;
 	}
-	PlaybackState state = get_playback_state();
-	if(state != PAUSED) {
-		inner_event_instance->setPaused(true);
+	inner_event_instance->setPaused(true);
+}
+
+bool FmodEventInstance::is_paused() {
+	if(!is_instance_valid()) {
+		return false;
 	}
+	bool paused = false;
+	inner_event_instance->getPaused(&paused);
+	return paused;
 }
 
 void FmodEventInstance::stop(const bool stop_immediately) {
@@ -79,6 +86,9 @@ void FmodEventInstance::stop(const bool stop_immediately) {
 
 FmodEventInstance::PlaybackState FmodEventInstance::get_playback_state() {
 	ERR_FAIL_COND_V_MSG(!is_instance_valid(), PlaybackState::STOPPED, vformat("Could not get playback state. Event instance is invalid. (%s)", event_path));
+	if (is_paused()) {
+		return PAUSED;
+	}
     FMOD_STUDIO_PLAYBACK_STATE p_state = FMOD_STUDIO_PLAYBACK_STOPPED;
     inner_event_instance->getPlaybackState(&p_state);
 

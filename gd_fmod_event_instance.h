@@ -40,8 +40,10 @@ public:
     };
 	void play();
 	void pause();
-	void stop(const bool stop_immediately=false);
-    PlaybackState get_playback_state();
+	bool is_paused();
+	void set_is_paused(bool value);
+	void stop(const bool stop_immediately = false);
+	PlaybackState get_playback_state();
 
     // Parameters
 	void set_parameter(const String p_name, const float p_value);
