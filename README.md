@@ -23,12 +23,14 @@ Locate the libraries by navigating to the `api` folder you copied into the modul
 You'll see folders named after the architecture they're designed for. (x86 for 32-Bit, x64 for 64-bit, and arm for Mac Sillicon)
 
 **On Windows:**
-	Copy `fmodL.dll` and `fmodstudioL.dll` to your Godot location.
+	Copy `fmod.dll` and `fmodstudio.dll` to your Godot location. FMOD
 
 **On Mac and Linux:**
-	Copy `libfmodL.so` and `libfmodstudioL.so` to your Godot location.
+	Copy `libfmod.so` and `libfmodstudio.so` to your Godot location.
 
-**This process can be confusing. Create an issue or DM me on Discord `jordi ★#0317` for further support!**
+If you'd like to enable debugging/logging for FMOD, copy the FMOD libraries that end with a capital 'L'. These are the __L__ogging releases of FMOD.
+
+**This process can be confusing. Create an issue for further support!**
 
 # Usage
 * Configure FMOD by visting `Project Settings/Fmod`
