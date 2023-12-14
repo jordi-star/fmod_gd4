@@ -28,7 +28,7 @@ You'll see folders named after the architecture they're designed for. (x86 for 3
 **On Mac and Linux:**
 	Copy `libfmod.so` and `libfmodstudio.so` to your Godot location.
 
-If you'd like to enable debugging/logging for FMOD, copy the FMOD libraries that end with a capital 'L'. These are the __L__ogging releases of FMOD.
+If you'd like to enable debugging/logging for FMOD, copy the FMOD libraries that end with a capital 'L'. These are the ***L***ogging releases of FMOD.
 
 **This process can be confusing. Create an issue for further support!**
 
