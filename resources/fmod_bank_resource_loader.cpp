@@ -14,19 +14,19 @@ Ref<Resource> FmodBankResourceLoader::load(const String &p_path, const String &p
 }
 
 void FmodBankResourceLoader::get_recognized_extensions(List<String> *r_extensions) const {
-	if (!r_extensions->find("bank")) {
-		r_extensions->push_back("bank");
-	}
+	r_extensions->push_back("bank");
 }
 
 bool FmodBankResourceLoader::handles_type(const String &p_type) const {
-	return ClassDB::is_parent_class(p_type, "Resource");
+	return (p_type == "FmodBank");
 }
-
 String FmodBankResourceLoader::get_resource_type(const String &p_path) const {
-	return "FmodBank";
+	String el = p_path.get_extension().to_lower();
+	if (el == "bank") {
+		return "FmodBank";
+	}
+	return "";
 }
 
 FmodBankResourceLoader::FmodBankResourceLoader() {
 }
-

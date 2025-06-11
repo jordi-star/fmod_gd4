@@ -131,7 +131,7 @@ void FmodEventInstance::activate_fmod_callback_reciever() {
 	inner_event_instance->setCallback(FmodEventInstance::fmod_callback, FMOD_STUDIO_EVENT_CALLBACK_STARTED | FMOD_STUDIO_EVENT_CALLBACK_STOPPED | FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_BEAT);
 }
 
-FMOD_RESULT F_CALLBACK FmodEventInstance::fmod_callback(FMOD_STUDIO_EVENT_CALLBACK_TYPE type, FMOD_STUDIO_EVENTINSTANCE *event, void *parameters) {
+FMOD_RESULT F_CALL FmodEventInstance::fmod_callback(FMOD_STUDIO_EVENT_CALLBACK_TYPE type, FMOD_STUDIO_EVENTINSTANCE *event, void *parameters) {
 	FMOD::Studio::EventInstance *event_instance = reinterpret_cast<FMOD::Studio::EventInstance *>(event);
 	if (event_instance == nullptr) {
 		return FMOD_ERR_INVALID_HANDLE;

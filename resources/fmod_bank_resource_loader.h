@@ -16,6 +16,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 class FmodBankResourceLoader : public ResourceFormatLoader {
 	GDCLASS(FmodBankResourceLoader, ResourceFormatLoader);
+
 protected:
 	static void _bind_methods();
 

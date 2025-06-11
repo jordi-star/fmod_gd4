@@ -73,7 +73,7 @@ public:
 	bool added_to_tree = false;
 
     void _notification(int p_what);
-	static FMOD_RESULT F_CALLBACK debug_callback(FMOD_DEBUG_FLAGS flags, const char *file, int line, const char *func, const char *message);
+	static FMOD_RESULT F_CALL debug_callback(FMOD_DEBUG_FLAGS flags, const char *file, int line, const char *func, const char *message);
 	Error initialize(InitFlags studio_flags, int max_channels);
 	void enable_debugging(DebugFlags debug_flags);
 	bool is_initialized();

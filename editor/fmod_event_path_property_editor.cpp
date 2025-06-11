@@ -1,5 +1,5 @@
 #include "fmod_event_path_property_editor.h"
-#include "editor/editor_scale.h"
+#include "editor/themes/editor_scale.h"
 #include "editor_fmod_manager.h"
 
 void FmodEventPathPicker::_bind_methods() {
@@ -22,14 +22,14 @@ void FmodEventPathPicker::assign_event(String event) {
 void FmodEventPathPicker::update_property() {
 	String event_path = get_edited_object()->get(get_edited_property());
 	if (event_path.is_empty()) {
-		assign->set_icon(EditorNode::get_singleton()->get_class_icon("AudioStreamMP3", "AudioStream"));
+		assign->set_button_icon(EditorNode::get_singleton()->get_class_icon("AudioStreamMP3", "AudioStream"));
 		assign->set_text("Assign Event...");
 		assign->set_flat(false);
 		return;
 	}
 	assign->set_flat(true);
 	assign->set_text(event_path);
-	assign->set_icon(EditorNode::get_singleton()->get_class_icon("AudioStreamPlayer"));
+	assign->set_button_icon(EditorNode::get_singleton()->get_class_icon("AudioStreamPlayer"));
 }
 
 FmodEventPathPicker::FmodEventPathPicker() {

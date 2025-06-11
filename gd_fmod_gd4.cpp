@@ -207,7 +207,7 @@ void FmodManager::_notification(int p_what) {
     }
 }
 
-FMOD_RESULT F_CALLBACK FmodManager::debug_callback(FMOD_DEBUG_FLAGS flags, const char *file, int line, const char *func, const char *message) {
+FMOD_RESULT F_CALL FmodManager::debug_callback(FMOD_DEBUG_FLAGS flags, const char *file, int line, const char *func, const char *message) {
 	print_line(vformat("FMOD [%s \"%s\"]:%s", line, func, message));
 	return FMOD_OK;
 }
