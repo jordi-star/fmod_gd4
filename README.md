@@ -5,7 +5,7 @@ This branch targets the latest stable Godot release (4.4.x) and FMOD 2.02.
 # Installation
 1. Clone `godot` and switch to 4.4:
 > `git clone https://github.com/godotengine/godot`
-> `cd godot && git checkout tags/4.2-stable`
+> `cd godot && git checkout tags/4.4-stable`
 2. Clone `fmod_gd4` into Godot's `modules/` folder.
 > `cd modules && git clone https://github.com/summertimejordi/fmod_gd4`
 3. Download [FMOD Engine 2.02+](https://www.fmod.com/download#FMOD%20Engine-select)
